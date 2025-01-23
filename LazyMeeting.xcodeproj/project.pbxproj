@@ -1,0 +1,546 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXContainerItemProxy section */
+		5AA0A6DA2D41E6250012D893 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 5AA0A6C02D41E6240012D893 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 5AA0A6C72D41E6240012D893;
+			remoteInfo = LazyMeeting;
+		};
+		5AA0A6E42D41E6250012D893 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 5AA0A6C02D41E6240012D893 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 5AA0A6C72D41E6240012D893;
+			remoteInfo = LazyMeeting;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		5AA0A6C82D41E6240012D893 /* LazyMeeting.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LazyMeeting.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		5AA0A6D92D41E6250012D893 /* LazyMeetingTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = LazyMeetingTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		5AA0A6E32D41E6250012D893 /* LazyMeetingUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = LazyMeetingUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		5AA0A6CA2D41E6240012D893 /* LazyMeeting */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = LazyMeeting;
+			sourceTree = "<group>";
+		};
+		5AA0A6DC2D41E6250012D893 /* LazyMeetingTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = LazyMeetingTests;
+			sourceTree = "<group>";
+		};
+		5AA0A6E62D41E6250012D893 /* LazyMeetingUITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = LazyMeetingUITests;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		5AA0A6C52D41E6240012D893 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5AA0A6D62D41E6250012D893 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5AA0A6E02D41E6250012D893 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		5AA0A6BF2D41E6240012D893 = {
+			isa = PBXGroup;
+			children = (
+				5AA0A6CA2D41E6240012D893 /* LazyMeeting */,
+				5AA0A6DC2D41E6250012D893 /* LazyMeetingTests */,
+				5AA0A6E62D41E6250012D893 /* LazyMeetingUITests */,
+				5AA0A6C92D41E6240012D893 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		5AA0A6C92D41E6240012D893 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				5AA0A6C82D41E6240012D893 /* LazyMeeting.app */,
+				5AA0A6D92D41E6250012D893 /* LazyMeetingTests.xctest */,
+				5AA0A6E32D41E6250012D893 /* LazyMeetingUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		5AA0A6C72D41E6240012D893 /* LazyMeeting */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 5AA0A6ED2D41E6250012D893 /* Build configuration list for PBXNativeTarget "LazyMeeting" */;
+			buildPhases = (
+				5AA0A6C42D41E6240012D893 /* Sources */,
+				5AA0A6C52D41E6240012D893 /* Frameworks */,
+				5AA0A6C62D41E6240012D893 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				5AA0A6CA2D41E6240012D893 /* LazyMeeting */,
+			);
+			name = LazyMeeting;
+			packageProductDependencies = (
+			);
+			productName = LazyMeeting;
+			productReference = 5AA0A6C82D41E6240012D893 /* LazyMeeting.app */;
+			productType = "com.apple.product-type.application";
+		};
+		5AA0A6D82D41E6250012D893 /* LazyMeetingTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 5AA0A6F02D41E6250012D893 /* Build configuration list for PBXNativeTarget "LazyMeetingTests" */;
+			buildPhases = (
+				5AA0A6D52D41E6250012D893 /* Sources */,
+				5AA0A6D62D41E6250012D893 /* Frameworks */,
+				5AA0A6D72D41E6250012D893 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				5AA0A6DB2D41E6250012D893 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				5AA0A6DC2D41E6250012D893 /* LazyMeetingTests */,
+			);
+			name = LazyMeetingTests;
+			packageProductDependencies = (
+			);
+			productName = LazyMeetingTests;
+			productReference = 5AA0A6D92D41E6250012D893 /* LazyMeetingTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		5AA0A6E22D41E6250012D893 /* LazyMeetingUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 5AA0A6F32D41E6250012D893 /* Build configuration list for PBXNativeTarget "LazyMeetingUITests" */;
+			buildPhases = (
+				5AA0A6DF2D41E6250012D893 /* Sources */,
+				5AA0A6E02D41E6250012D893 /* Frameworks */,
+				5AA0A6E12D41E6250012D893 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				5AA0A6E52D41E6250012D893 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				5AA0A6E62D41E6250012D893 /* LazyMeetingUITests */,
+			);
+			name = LazyMeetingUITests;
+			packageProductDependencies = (
+			);
+			productName = LazyMeetingUITests;
+			productReference = 5AA0A6E32D41E6250012D893 /* LazyMeetingUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		5AA0A6C02D41E6240012D893 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1620;
+				LastUpgradeCheck = 1620;
+				TargetAttributes = {
+					5AA0A6C72D41E6240012D893 = {
+						CreatedOnToolsVersion = 16.2;
+					};
+					5AA0A6D82D41E6250012D893 = {
+						CreatedOnToolsVersion = 16.2;
+						TestTargetID = 5AA0A6C72D41E6240012D893;
+					};
+					5AA0A6E22D41E6250012D893 = {
+						CreatedOnToolsVersion = 16.2;
+						TestTargetID = 5AA0A6C72D41E6240012D893;
+					};
+				};
+			};
+			buildConfigurationList = 5AA0A6C32D41E6240012D893 /* Build configuration list for PBXProject "LazyMeeting" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 5AA0A6BF2D41E6240012D893;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 5AA0A6C92D41E6240012D893 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				5AA0A6C72D41E6240012D893 /* LazyMeeting */,
+				5AA0A6D82D41E6250012D893 /* LazyMeetingTests */,
+				5AA0A6E22D41E6250012D893 /* LazyMeetingUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		5AA0A6C62D41E6240012D893 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5AA0A6D72D41E6250012D893 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5AA0A6E12D41E6250012D893 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		5AA0A6C42D41E6240012D893 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5AA0A6D52D41E6250012D893 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5AA0A6DF2D41E6250012D893 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		5AA0A6DB2D41E6250012D893 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 5AA0A6C72D41E6240012D893 /* LazyMeeting */;
+			targetProxy = 5AA0A6DA2D41E6250012D893 /* PBXContainerItemProxy */;
+		};
+		5AA0A6E52D41E6250012D893 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 5AA0A6C72D41E6240012D893 /* LazyMeeting */;
+			targetProxy = 5AA0A6E42D41E6250012D893 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		5AA0A6EB2D41E6250012D893 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.2;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		5AA0A6EC2D41E6250012D893 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.2;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+			};
+			name = Release;
+		};
+		5AA0A6EE2D41E6250012D893 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = LazyMeeting/LazyMeeting.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"LazyMeeting/Preview Content\"";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = momaek.LazyMeeting;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		5AA0A6EF2D41E6250012D893 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = LazyMeeting/LazyMeeting.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"LazyMeeting/Preview Content\"";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = momaek.LazyMeeting;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		5AA0A6F12D41E6250012D893 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = momaek.LazyMeetingTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/LazyMeeting.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/LazyMeeting";
+			};
+			name = Debug;
+		};
+		5AA0A6F22D41E6250012D893 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = momaek.LazyMeetingTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/LazyMeeting.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/LazyMeeting";
+			};
+			name = Release;
+		};
+		5AA0A6F42D41E6250012D893 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = momaek.LazyMeetingUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TEST_TARGET_NAME = LazyMeeting;
+			};
+			name = Debug;
+		};
+		5AA0A6F52D41E6250012D893 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = momaek.LazyMeetingUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TEST_TARGET_NAME = LazyMeeting;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		5AA0A6C32D41E6240012D893 /* Build configuration list for PBXProject "LazyMeeting" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5AA0A6EB2D41E6250012D893 /* Debug */,
+				5AA0A6EC2D41E6250012D893 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		5AA0A6ED2D41E6250012D893 /* Build configuration list for PBXNativeTarget "LazyMeeting" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5AA0A6EE2D41E6250012D893 /* Debug */,
+				5AA0A6EF2D41E6250012D893 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		5AA0A6F02D41E6250012D893 /* Build configuration list for PBXNativeTarget "LazyMeetingTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5AA0A6F12D41E6250012D893 /* Debug */,
+				5AA0A6F22D41E6250012D893 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		5AA0A6F32D41E6250012D893 /* Build configuration list for PBXNativeTarget "LazyMeetingUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5AA0A6F42D41E6250012D893 /* Debug */,
+				5AA0A6F52D41E6250012D893 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 5AA0A6C02D41E6240012D893 /* Project object */;
+}
