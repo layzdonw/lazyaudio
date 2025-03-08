@@ -1,97 +1,26 @@
 import SwiftUI
 import Combine
+import Foundation
+import AppKit
 
 class SettingsViewModel: ObservableObject {
-    @Published var isDarkMode: Bool {
-        didSet {
-            UserDefaults.standard.set(isDarkMode, forKey: "isDarkMode")
-            updateAppearance()
-        }
-    }
-    
-    @Published var selectedLanguage: Int {
-        didSet {
-            UserDefaults.standard.set(selectedLanguage, forKey: "selectedLanguage")
-        }
-    }
-    
-    @Published var selectedModel: Int {
-        didSet {
-            UserDefaults.standard.set(selectedModel, forKey: "selectedModel")
-        }
-    }
-    
-    @Published var apiKey: String {
-        didSet {
-            // 在实际应用中，应该安全地存储 API 密钥，例如使用钥匙串
-            UserDefaults.standard.set(apiKey, forKey: "apiKey")
-        }
-    }
-    
-    @Published var modelTemperature: Double {
-        didSet {
-            UserDefaults.standard.set(modelTemperature, forKey: "modelTemperature")
-        }
-    }
-    
-    @Published var maxTokens: Int {
-        didSet {
-            UserDefaults.standard.set(maxTokens, forKey: "maxTokens")
-        }
-    }
-    
-    @Published var localModelPath: String {
-        didSet {
-            UserDefaults.standard.set(localModelPath, forKey: "localModelPath")
-        }
-    }
-    
-    @Published var storagePath: String {
-        didSet {
-            UserDefaults.standard.set(storagePath, forKey: "storagePath")
-        }
-    }
-    
-    @Published var autoCleanup: Bool {
-        didSet {
-            UserDefaults.standard.set(autoCleanup, forKey: "autoCleanup")
-        }
-    }
-    
-    @Published var retentionPeriod: Int {
-        didSet {
-            UserDefaults.standard.set(retentionPeriod, forKey: "retentionPeriod")
-        }
-    }
+    @Published var isDarkMode: Bool = false
+    @Published var selectedLanguage: Int = 0
+    @Published var useSherpaOnnx: Bool = false
+    @Published var selectedAIModel: Int = 0
+    @Published var apiKey: String = ""
+    @Published var apiBase: String = "https://api.openai.com/v1"
+    @Published var localModelPath: String = ""
+    @Published var cacheDirectory: String = ""
+    @Published var modelTemperature: Double = 0.7
+    @Published var maxTokens: Int = 2048
+    @Published var storagePath: String = ""
+    @Published var autoCleanup: Bool = true
+    @Published var retentionPeriod: Int = 30
+    @Published var fontSize: Int = 1 // 0: 小, 1: 中, 2: 大
     
     init() {
-        // 从 UserDefaults 加载设置
-        self.isDarkMode = UserDefaults.standard.bool(forKey: "isDarkMode")
-        self.selectedLanguage = UserDefaults.standard.integer(forKey: "selectedLanguage")
-        self.selectedModel = UserDefaults.standard.integer(forKey: "selectedModel")
-        self.apiKey = UserDefaults.standard.string(forKey: "apiKey") ?? ""
-        self.modelTemperature = UserDefaults.standard.double(forKey: "modelTemperature")
-        self.maxTokens = UserDefaults.standard.integer(forKey: "maxTokens")
-        self.localModelPath = UserDefaults.standard.string(forKey: "localModelPath") ?? ""
-        self.storagePath = UserDefaults.standard.string(forKey: "storagePath") ?? ""
-        self.autoCleanup = UserDefaults.standard.bool(forKey: "autoCleanup")
-        self.retentionPeriod = UserDefaults.standard.integer(forKey: "retentionPeriod")
-        
-        // 设置默认值
-        if self.modelTemperature == 0 {
-            self.modelTemperature = 0.7
-        }
-        
-        if self.maxTokens == 0 {
-            self.maxTokens = 4096
-        }
-        
-        if self.retentionPeriod == 0 {
-            self.retentionPeriod = 30
-        }
-        
-        // 初始化时应用当前的外观设置
-        updateAppearance()
+        loadSettings()
     }
     
     private func updateAppearance() {
@@ -100,29 +29,103 @@ class SettingsViewModel: ObservableObject {
     }
     
     func selectLocalModelPath() {
-        // 在实际应用中，这里应该打开文件选择器
-        // 由于 SwiftUI 的限制，可能需要通过 NSOpenPanel 实现
+        let openPanel = NSOpenPanel()
+        openPanel.title = "选择模型文件"
+        openPanel.allowsMultipleSelection = false
+        openPanel.canChooseDirectories = false
+        openPanel.canChooseFiles = true
+        openPanel.allowedFileTypes = ["onnx"]
+        
+        if openPanel.runModal() == .OK {
+            if let url = openPanel.url {
+                self.localModelPath = url.path
+            }
+        }
+    }
+    
+    func selectCacheDirectory() {
+        let openPanel = NSOpenPanel()
+        openPanel.title = "选择缓存目录"
+        openPanel.allowsMultipleSelection = false
+        openPanel.canChooseDirectories = true
+        openPanel.canChooseFiles = false
+        
+        if openPanel.runModal() == .OK {
+            if let url = openPanel.url {
+                self.cacheDirectory = url.path
+            }
+        }
     }
     
     func selectStoragePath() {
-        // 在实际应用中，这里应该打开文件夹选择器
+        let openPanel = NSOpenPanel()
+        openPanel.title = "选择存储位置"
+        openPanel.allowsMultipleSelection = false
+        openPanel.canChooseDirectories = true
+        openPanel.canChooseFiles = false
+        
+        if openPanel.runModal() == .OK {
+            if let url = openPanel.url {
+                self.storagePath = url.path
+            }
+        }
     }
     
     func checkForUpdates() {
-        // 检查更新逻辑
+        // 模拟检查更新
+        print("检查更新...")
     }
     
     func openPrivacyPolicy() {
-        // 打开隐私政策
         if let url = URL(string: "https://example.com/privacy") {
             NSWorkspace.shared.open(url)
         }
     }
     
     func openTermsOfService() {
-        // 打开使用条款
         if let url = URL(string: "https://example.com/terms") {
             NSWorkspace.shared.open(url)
         }
+    }
+    
+    // 保存设置
+    func saveSettings() {
+        // 这里实现保存设置到UserDefaults或其他存储
+        UserDefaults.standard.set(isDarkMode, forKey: "isDarkMode")
+        UserDefaults.standard.set(selectedLanguage, forKey: "selectedLanguage")
+        UserDefaults.standard.set(useSherpaOnnx, forKey: "useSherpaOnnx")
+        UserDefaults.standard.set(selectedAIModel, forKey: "selectedAIModel")
+        UserDefaults.standard.set(apiKey, forKey: "apiKey")
+        UserDefaults.standard.set(apiBase, forKey: "apiBase")
+        UserDefaults.standard.set(localModelPath, forKey: "localModelPath")
+        UserDefaults.standard.set(cacheDirectory, forKey: "cacheDirectory")
+        UserDefaults.standard.set(modelTemperature, forKey: "modelTemperature")
+        UserDefaults.standard.set(maxTokens, forKey: "maxTokens")
+        UserDefaults.standard.set(storagePath, forKey: "storagePath")
+        UserDefaults.standard.set(autoCleanup, forKey: "autoCleanup")
+        UserDefaults.standard.set(retentionPeriod, forKey: "retentionPeriod")
+        UserDefaults.standard.set(fontSize, forKey: "fontSize")
+    }
+    
+    // 加载设置
+    func loadSettings() {
+        isDarkMode = UserDefaults.standard.bool(forKey: "isDarkMode")
+        selectedLanguage = UserDefaults.standard.integer(forKey: "selectedLanguage")
+        useSherpaOnnx = UserDefaults.standard.bool(forKey: "useSherpaOnnx")
+        selectedAIModel = UserDefaults.standard.integer(forKey: "selectedAIModel")
+        apiKey = UserDefaults.standard.string(forKey: "apiKey") ?? ""
+        apiBase = UserDefaults.standard.string(forKey: "apiBase") ?? "https://api.openai.com/v1"
+        localModelPath = UserDefaults.standard.string(forKey: "localModelPath") ?? ""
+        cacheDirectory = UserDefaults.standard.string(forKey: "cacheDirectory") ?? ""
+        modelTemperature = UserDefaults.standard.double(forKey: "modelTemperature")
+        if modelTemperature == 0 { modelTemperature = 0.7 } // 默认值
+        maxTokens = UserDefaults.standard.integer(forKey: "maxTokens")
+        if maxTokens == 0 { maxTokens = 2048 } // 默认值
+        storagePath = UserDefaults.standard.string(forKey: "storagePath") ?? ""
+        autoCleanup = UserDefaults.standard.bool(forKey: "autoCleanup")
+        retentionPeriod = UserDefaults.standard.integer(forKey: "retentionPeriod")
+        if retentionPeriod == 0 { retentionPeriod = 30 } // 默认值
+        fontSize = UserDefaults.standard.integer(forKey: "fontSize")
+        if fontSize == 0 { fontSize = 1 } // 默认为中等大小
     }
 } 
