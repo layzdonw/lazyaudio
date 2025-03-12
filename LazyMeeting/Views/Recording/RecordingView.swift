@@ -84,11 +84,6 @@ struct RecordingView: View {
                             .pickerStyle(MenuPickerStyle())
                             .frame(width: 200)
                             .disabled(isRecording)
-                            .onChange(of: audioSourceType) { _ in
-                                if audioSourceType == .appAudio && runningApps.isEmpty {
-                                    runningApps = AppModels.getRunningApps()
-                                }
-                            }
                         }
                         
                         Spacer()
@@ -216,8 +211,29 @@ struct RecordingView: View {
         }
         .background(Color(nsColor: .windowBackgroundColor))
         .onAppear {
+            // 在视图出现时加载运行中的应用列表
+            loadRunningApps()
+        }
+        .onChange(of: audioSourceType) { _ in
+            // 当音频源类型变更时，如果是应用音频则重新加载应用列表
             if audioSourceType == .appAudio {
-                runningApps = AppModels.getRunningApps()
+                loadRunningApps()
+            }
+        }
+    }
+    
+    // 加载运行中的应用列表
+    private func loadRunningApps() {
+        // 清空现有列表并重新获取
+        runningApps = []
+        DispatchQueue.main.async {
+            runningApps = AppModels.getRunningApps()
+            
+            // 如果列表为空，再尝试一次
+            if runningApps.isEmpty {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    runningApps = AppModels.getRunningApps()
+                }
             }
         }
     }

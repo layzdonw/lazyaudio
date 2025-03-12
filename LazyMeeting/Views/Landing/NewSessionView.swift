@@ -64,6 +64,7 @@ struct NewSessionView: View {
                     if audioSourceType == .appAudio {
                         HStack {
                             Text("选择应用")
+                                .font(.subheadline)
                             
                             Spacer()
                             
@@ -74,12 +75,7 @@ struct NewSessionView: View {
                                 }
                             }
                             .pickerStyle(MenuPickerStyle())
-                            .frame(width: 200)
-                            .onChange(of: audioSourceType) { _ in
-                                if audioSourceType == .appAudio && runningApps.isEmpty {
-                                    runningApps = AppModels.getRunningApps()
-                                }
-                            }
+                            .frame(maxWidth: 200)
                         }
                     }
                     
@@ -137,12 +133,26 @@ struct NewSessionView: View {
             }
         }
         .padding(24)
-        .frame(width: 500, height: 400)
+        .frame(width: 500, height: 450) // 增加高度以适应额外内容
         .background(Color(nsColor: .windowBackgroundColor))
         .onAppear {
+            // 在视图出现时立即加载运行中的应用列表
+            loadRunningApps()
+        }
+        .onChange(of: audioSourceType) { _ in
+            // 当音频源类型变更时重新加载应用列表
             if audioSourceType == .appAudio {
-                runningApps = AppModels.getRunningApps()
+                loadRunningApps()
             }
+        }
+    }
+    
+    // 加载运行中的应用列表
+    private func loadRunningApps() {
+        // 清空现有列表并重新获取
+        runningApps = []
+        DispatchQueue.main.async {
+            runningApps = AppModels.getRunningApps()
         }
     }
 }
