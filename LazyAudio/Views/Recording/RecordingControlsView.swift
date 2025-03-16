@@ -21,9 +21,10 @@ struct RecordingControlsView: View {
                     Image(systemName: isRecording ? "stop.fill" : "record.circle.fill")
                         .font(.system(size: 16))
                     
-                    Text(isRecording ? "停止录制" : "开始录制")
-                        .font(.body)
-                        .fontWeight(.medium)
+                    LocalizedText(
+                        key: isRecording ? "recording.stop" : "recording.start",
+                        font: .body.weight(.medium)
+                    )
                 }
                 .foregroundColor(.white)
                 .padding(.vertical, 8)

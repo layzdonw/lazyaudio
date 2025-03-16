@@ -12,7 +12,7 @@ struct AppToolbar: ToolbarContent {
             Button(action: {
                 showNewSession = true
             }) {
-                Label("新建", systemImage: "plus")
+                Label("main.new_session".localized, systemImage: "plus")
             }
         }
         
@@ -20,7 +20,7 @@ struct AppToolbar: ToolbarContent {
             Button(action: {
                 isDarkMode.toggle()
             }) {
-                Label("切换模式", systemImage: isDarkMode ? "sun.max" : "moon")
+                Label("main.toggle_theme".localized, systemImage: isDarkMode ? "sun.max" : "moon")
             }
         }
         
@@ -28,7 +28,7 @@ struct AppToolbar: ToolbarContent {
             Button(action: {
                 showSettings = true
             }) {
-                Label("设置", systemImage: "gear")
+                Label("settings.title".localized, systemImage: "gear")
             }
         }
     }

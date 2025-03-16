@@ -11,6 +11,7 @@ import SwiftUI
 struct LazyAudioApp: App {
     @AppStorage("isDarkMode") private var isDarkMode = false
     @AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding = false
+    @StateObject private var localizationManager = LocalizationManager.shared
     
     var body: some Scene {
         WindowGroup {
@@ -18,10 +19,12 @@ struct LazyAudioApp: App {
                 ContentView()
                     .preferredColorScheme(isDarkMode ? .dark : .light)
                     .frame(minWidth: 1080, minHeight: 720)
+                    .environmentObject(localizationManager)
             } else {
                 LandingView()
                     .preferredColorScheme(isDarkMode ? .dark : .light)
                     .frame(width: 800, height: 600)
+                    .environmentObject(localizationManager)
                     .onDisappear {
                         hasCompletedOnboarding = true
                     }
@@ -31,13 +34,13 @@ struct LazyAudioApp: App {
         .commands {
             // 添加自定义菜单
             CommandGroup(replacing: .appInfo) {
-                Button("关于 LazyAudio") {
+                Button("app.about".localized) {
                     NSApplication.shared.orderFrontStandardAboutPanel(
                         options: [
-                            NSApplication.AboutPanelOptionKey.applicationName: "LazyAudio",
+                            NSApplication.AboutPanelOptionKey.applicationName: "app.name".localized,
                             NSApplication.AboutPanelOptionKey.applicationVersion: "1.0.0",
                             NSApplication.AboutPanelOptionKey.credits: NSAttributedString(
-                                string: "智能音频转录与分析工具",
+                                string: "app.description".localized,
                                 attributes: [
                                     NSAttributedString.Key.font: NSFont.systemFont(ofSize: 11),
                                     NSAttributedString.Key.foregroundColor: NSColor.secondaryLabelColor
@@ -51,30 +54,39 @@ struct LazyAudioApp: App {
             CommandGroup(after: .appInfo) {
                 Divider()
                 
-                Button("检查更新...") {
+                Button("app.check_updates".localized) {
                     // 检查更新逻辑
                 }
                 
                 Divider()
                 
-                Button(isDarkMode ? "切换到浅色模式" : "切换到深色模式") {
+                Button(isDarkMode ? "app.switch_light".localized : "app.switch_dark".localized) {
                     isDarkMode.toggle()
                 }
                 .keyboardShortcut("d", modifiers: [.command, .option])
+                
+                Menu("app.language".localized) {
+                    ForEach(localizationManager.supportedLanguages, id: \.id) { language in
+                        Button(language.displayName) {
+                            localizationManager.switchLanguage(to: language)
+                        }
+                        .disabled(localizationManager.currentLanguage == language)
+                    }
+                }
             }
             
-            CommandMenu("录制") {
-                Button("新建录制会话") {
+            CommandMenu("recording.menu".localized) {
+                Button("recording.new_session".localized) {
                     // 新建录制会话逻辑
                 }
                 .keyboardShortcut("n", modifiers: .command)
                 
-                Button("开始录制") {
+                Button("recording.start".localized) {
                     // 开始录制逻辑
                 }
                 .keyboardShortcut("r", modifiers: .command)
                 
-                Button("停止录制") {
+                Button("recording.stop".localized) {
                     // 停止录制逻辑
                 }
                 .keyboardShortcut("s", modifiers: .command)

@@ -3,18 +3,17 @@ import SwiftUI
 /// 通用侧边栏组件
 /// 用于展示左侧或右侧的内容面板
 struct SidebarView<Content: View>: View {
-    let title: String
+    let titleKey: String
     let content: Content
     
-    init(title: String, @ViewBuilder content: () -> Content) {
-        self.title = title
+    init(titleKey: String, @ViewBuilder content: () -> Content) {
+        self.titleKey = titleKey
         self.content = content()
     }
     
     var body: some View {
         VStack {
-            Text(title)
-                .font(.headline)
+            LocalizedText(key: titleKey, font: .headline)
                 .padding(.top, 20)
                 .padding(.bottom, 10)
             
@@ -26,7 +25,7 @@ struct SidebarView<Content: View>: View {
 }
 
 #Preview {
-    SidebarView(title: "侧边栏") {
+    SidebarView(titleKey: "history.title") {
         Text("侧边栏内容")
     }
     .frame(width: 250, height: 500)

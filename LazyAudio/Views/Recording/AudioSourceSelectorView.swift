@@ -13,13 +13,12 @@ struct AudioSourceSelectorView: View {
         VStack(spacing: 12) {
             // 系统音频和应用音频二选一
             HStack {
-                Text("音频源:")
-                    .font(.subheadline)
+                LocalizedText(key: "recording.audio_source", font: .subheadline)
                     .foregroundColor(.secondary)
                 
                 Picker("", selection: $audioSourceType) {
-                    Text("系统音频").tag(AudioSourceType.systemAudio)
-                    Text("应用音频").tag(AudioSourceType.appAudio)
+                    LocalizedText(key: "recording.system_audio").tag(AudioSourceType.systemAudio)
+                    LocalizedText(key: "recording.app_audio").tag(AudioSourceType.appAudio)
                 }
                 .pickerStyle(SegmentedPickerStyle())
                 .frame(width: 200)
@@ -27,7 +26,7 @@ struct AudioSourceSelectorView: View {
                 
                 if audioSourceType == .appAudio {
                     Picker("", selection: $selectedApp) {
-                        Text("选择应用").tag("")
+                        LocalizedText(key: "recording.select_app").tag("")
                         ForEach(runningApps) { app in
                             Text(app.name).tag(app.bundleIdentifier)
                         }
@@ -43,7 +42,11 @@ struct AudioSourceSelectorView: View {
             // 麦克风选项（独立选项）
             HStack {
                 Toggle(isOn: $useMicrophone) {
-                    Label("同时录制麦克风", systemImage: "mic.fill")
+                    Label {
+                        LocalizedText(key: "recording.use_microphone")
+                    } icon: {
+                        Image(systemName: "mic.fill")
+                    }
                 }
                 .disabled(isRecording)
                 

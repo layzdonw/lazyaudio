@@ -10,19 +10,13 @@ struct ContentView: View {
         MainLayout(
             left: {
                 // 左侧栏 - 历史记录和快速导航
-                SidebarView(title: "历史记录") {
+                SidebarView(titleKey: "历史记录") {
                     HistoryView()
                 }
             },
             center: {
                 // 中间栏 - 实时转录展示和操作
                 RecordingView()
-            },
-            right: {
-                // 右侧栏 - 设置和AI功能
-                SidebarView(title: "AI 功能") {
-                    AIFunctionView()
-                }
             }
         )
         .toolbar {

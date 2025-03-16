@@ -5,7 +5,7 @@ import AppKit
 
 class SettingsViewModel: ObservableObject {
     @Published var isDarkMode: Bool = false
-    @Published var selectedLanguage: Int = 0
+    @Published var selectedLanguageCode: String = "en"
     @Published var useSherpaOnnx: Bool = false
     @Published var selectedAIModel: Int = 0
     @Published var apiKey: String = ""
@@ -19,8 +19,17 @@ class SettingsViewModel: ObservableObject {
     @Published var retentionPeriod: Int = 30
     @Published var fontSize: Int = 1 // 0: 小, 1: 中, 2: 大
     
+    private var cancellables = Set<AnyCancellable>()
+    
     init() {
         loadSettings()
+        
+        // 监听语言变化通知
+        NotificationCenter.default.publisher(for: Notification.Name("LanguageChanged"))
+            .sink { [weak self] _ in
+                self?.saveSettings()
+            }
+            .store(in: &cancellables)
     }
     
     private func updateAppearance() {
@@ -30,7 +39,7 @@ class SettingsViewModel: ObservableObject {
     
     func selectLocalModelPath() {
         let openPanel = NSOpenPanel()
-        openPanel.title = "选择模型文件"
+        openPanel.title = "选择模型文件".localized
         openPanel.allowsMultipleSelection = false
         openPanel.canChooseDirectories = false
         openPanel.canChooseFiles = true
@@ -45,7 +54,7 @@ class SettingsViewModel: ObservableObject {
     
     func selectCacheDirectory() {
         let openPanel = NSOpenPanel()
-        openPanel.title = "选择缓存目录"
+        openPanel.title = "选择缓存目录".localized
         openPanel.allowsMultipleSelection = false
         openPanel.canChooseDirectories = true
         openPanel.canChooseFiles = false
@@ -59,7 +68,7 @@ class SettingsViewModel: ObservableObject {
     
     func selectStoragePath() {
         let openPanel = NSOpenPanel()
-        openPanel.title = "选择存储位置"
+        openPanel.title = "选择存储位置".localized
         openPanel.allowsMultipleSelection = false
         openPanel.canChooseDirectories = true
         openPanel.canChooseFiles = false
@@ -92,7 +101,7 @@ class SettingsViewModel: ObservableObject {
     func saveSettings() {
         // 这里实现保存设置到UserDefaults或其他存储
         UserDefaults.standard.set(isDarkMode, forKey: "isDarkMode")
-        UserDefaults.standard.set(selectedLanguage, forKey: "selectedLanguage")
+        UserDefaults.standard.set(selectedLanguageCode, forKey: "selectedLanguageCode")
         UserDefaults.standard.set(useSherpaOnnx, forKey: "useSherpaOnnx")
         UserDefaults.standard.set(selectedAIModel, forKey: "selectedAIModel")
         UserDefaults.standard.set(apiKey, forKey: "apiKey")
@@ -110,7 +119,7 @@ class SettingsViewModel: ObservableObject {
     // 加载设置
     func loadSettings() {
         isDarkMode = UserDefaults.standard.bool(forKey: "isDarkMode")
-        selectedLanguage = UserDefaults.standard.integer(forKey: "selectedLanguage")
+        selectedLanguageCode = UserDefaults.standard.string(forKey: "selectedLanguageCode") ?? LocalizationManager.shared.currentLanguage.rawValue
         useSherpaOnnx = UserDefaults.standard.bool(forKey: "useSherpaOnnx")
         selectedAIModel = UserDefaults.standard.integer(forKey: "selectedAIModel")
         apiKey = UserDefaults.standard.string(forKey: "apiKey") ?? ""

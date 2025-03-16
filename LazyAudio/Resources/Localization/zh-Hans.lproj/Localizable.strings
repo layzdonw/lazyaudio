@@ -7,6 +7,12 @@
 
 // 通用
 "app.name" = "懒音频";
+"app.about" = "关于懒音频";
+"app.description" = "智能音频转录与分析工具";
+"app.check_updates" = "检查更新...";
+"app.switch_light" = "切换到浅色模式";
+"app.switch_dark" = "切换到深色模式";
+"app.language" = "语言";
 "cancel" = "取消";
 "confirm" = "确认";
 "save" = "保存";
@@ -30,6 +36,8 @@
 "main.settings" = "设置";
 
 // 录音界面
+"recording.menu" = "录制";
+"recording.new_session" = "新建录制会话";
 "recording.title" = "实时转录";
 "recording.subtitle" = "选择音频源并开始录制";
 "recording.status" = "录制中";
@@ -49,6 +57,7 @@
 "ai.chat" = "直接Chat";
 
 // 历史记录
+"history.title" = "历史记录";
 "history.search" = "搜索历史记录";
 "history.filter.all" = "全部";
 "history.filter.today" = "今天";
@@ -73,6 +82,37 @@
 "settings.storage_location" = "存储位置";
 "settings.clear_cache" = "清除缓存";
 "settings.version" = "版本";
+"settings.font_size" = "字体大小";
+"settings.font_size.small" = "小";
+"settings.font_size.medium" = "中";
+"settings.font_size.large" = "大";
+"settings.use_local_model" = "使用本地模型 (sherpa-onnx)";
+"settings.sherpa_config" = "sherpa-onnx 配置";
+"settings.model_path" = "模型路径";
+"settings.cache_directory" = "缓存目录";
+"settings.not_selected" = "未选择";
+"settings.default" = "默认";
+"settings.choose" = "选择...";
+"settings.change" = "更改...";
+"settings.ai" = "AI 增强设置";
+"settings.ai_model" = "AI 模型";
+"settings.api_config" = "API 配置";
+"settings.api_key" = "API 密钥";
+"settings.api_base" = "API 地址";
+"settings.enter_api_key" = "输入 API 密钥";
+"settings.enter_api_base" = "输入 API 地址";
+"settings.advanced" = "高级设置";
+"settings.temperature" = "温度";
+"settings.max_tokens" = "最大标记数";
+"settings.auto_cleanup" = "自动清理过期录音";
+"settings.retention_period" = "保留时间";
+"settings.retention.7days" = "7 天";
+"settings.retention.30days" = "30 天";
+"settings.retention.90days" = "90 天";
+"settings.retention.forever" = "永久";
+"settings.check_updates" = "检查更新";
+"settings.privacy_policy" = "隐私政策";
+"settings.terms" = "使用条款";
 
 // 错误信息
 "error.recording" = "录音失败";

@@ -8,13 +8,10 @@ struct RecordingHeaderView: View {
     var body: some View {
         HStack {
             VStack(alignment: .leading, spacing: 4) {
-                Text("实时转录")
-                    .font(.title2)
-                    .fontWeight(.bold)
+                LocalizedText(key: "recording.title", font: .title2.bold())
                     .foregroundColor(.primary)
                 
-                Text("选择音频源并开始录制")
-                    .font(.subheadline)
+                LocalizedText(key: "recording.subtitle", font: .subheadline)
                     .foregroundColor(.secondary)
             }
             
@@ -36,10 +33,8 @@ struct RecordingStatusBadge: View {
             Circle()
                 .fill(Color.red)
                 .frame(width: 8, height: 8)
-            Text("录制中")
+            LocalizedText(key: "recording.status", font: .subheadline.weight(.medium))
                 .foregroundColor(.red)
-                .font(.subheadline)
-                .fontWeight(.medium)
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 6)

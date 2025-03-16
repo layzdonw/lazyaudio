@@ -7,6 +7,12 @@
 
 // Common
 "app.name" = "LazyAudio";
+"app.about" = "About LazyAudio";
+"app.description" = "Smart Audio Transcription & Analysis Tool";
+"app.check_updates" = "Check for Updates...";
+"app.switch_light" = "Switch to Light Mode";
+"app.switch_dark" = "Switch to Dark Mode";
+"app.language" = "Language";
 "cancel" = "Cancel";
 "confirm" = "Confirm";
 "save" = "Save";
@@ -30,6 +36,8 @@
 "main.settings" = "Settings";
 
 // Recording Screen
+"recording.menu" = "Recording";
+"recording.new_session" = "New Recording Session";
 "recording.title" = "Live Transcription";
 "recording.subtitle" = "Select audio source and start recording";
 "recording.status" = "Recording";
@@ -49,6 +57,7 @@
 "ai.chat" = "Direct Chat";
 
 // History
+"history.title" = "History";
 "history.search" = "Search History";
 "history.filter.all" = "All";
 "history.filter.today" = "Today";
@@ -73,6 +82,37 @@
 "settings.storage_location" = "Storage Location";
 "settings.clear_cache" = "Clear Cache";
 "settings.version" = "Version";
+"settings.font_size" = "Font Size";
+"settings.font_size.small" = "Small";
+"settings.font_size.medium" = "Medium";
+"settings.font_size.large" = "Large";
+"settings.use_local_model" = "Use Local Model (sherpa-onnx)";
+"settings.sherpa_config" = "sherpa-onnx Configuration";
+"settings.model_path" = "Model Path";
+"settings.cache_directory" = "Cache Directory";
+"settings.not_selected" = "Not Selected";
+"settings.default" = "Default";
+"settings.choose" = "Choose...";
+"settings.change" = "Change...";
+"settings.ai" = "AI Enhancement";
+"settings.ai_model" = "AI Model";
+"settings.api_config" = "API Configuration";
+"settings.api_key" = "API Key";
+"settings.api_base" = "API Base URL";
+"settings.enter_api_key" = "Enter API Key";
+"settings.enter_api_base" = "Enter API Base URL";
+"settings.advanced" = "Advanced Settings";
+"settings.temperature" = "Temperature";
+"settings.max_tokens" = "Max Tokens";
+"settings.auto_cleanup" = "Auto Cleanup Expired Recordings";
+"settings.retention_period" = "Retention Period";
+"settings.retention.7days" = "7 Days";
+"settings.retention.30days" = "30 Days";
+"settings.retention.90days" = "90 Days";
+"settings.retention.forever" = "Forever";
+"settings.check_updates" = "Check for Updates";
+"settings.privacy_policy" = "Privacy Policy";
+"settings.terms" = "Terms of Service";
 
 // Error Messages
 "error.recording" = "Recording Failed";
