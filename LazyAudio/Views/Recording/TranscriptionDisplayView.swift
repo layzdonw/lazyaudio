@@ -119,59 +119,6 @@ struct TranscriptionDisplayView: View {
             )
             .padding(.horizontal)
             
-            // AI 分析部分
-            VStack(alignment: .leading, spacing: 12) {
-                Text("AI 分析")
-                    .font(.title3)
-                    .fontWeight(.bold)
-                    .padding(.horizontal)
-                
-                VStack(alignment: .leading, spacing: 16) {
-                    HStack(spacing: 16) {
-                        VStack(alignment: .leading, spacing: 8) {
-                            Text("关键词")
-                                .font(.headline)
-                                .foregroundColor(.secondary)
-                            
-                            HStack {
-                                ForEach(["会议", "项目", "计划", "讨论"], id: \.self) { keyword in
-                                    Text(keyword)
-                                        .font(.caption)
-                                        .padding(.horizontal, 8)
-                                        .padding(.vertical, 4)
-                                        .background(Color.blue.opacity(0.1))
-                                        .foregroundColor(.blue)
-                                        .cornerRadius(4)
-                                }
-                            }
-                        }
-                        
-                        Divider()
-                        
-                        VStack(alignment: .leading, spacing: 8) {
-                            Text("情绪分析")
-                                .font(.headline)
-                                .foregroundColor(.secondary)
-                            
-                            HStack {
-                                Image(systemName: "face.smiling")
-                                    .foregroundColor(.green)
-                                Text("积极")
-                                    .foregroundColor(.green)
-                                
-                                Text("85%")
-                                    .font(.caption)
-                                    .foregroundColor(.secondary)
-                            }
-                        }
-                    }
-                    .padding()
-                }
-                .background(Color(nsColor: .controlBackgroundColor).opacity(0.2))
-                .cornerRadius(8)
-                .padding(.horizontal)
-            }
-            
             Spacer()
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
