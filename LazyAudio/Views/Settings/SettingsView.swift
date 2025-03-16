@@ -80,49 +80,37 @@ struct SettingsView: View {
                     
                     // 转录模型设置
                     SettingsSection(title: "settings.transcription".localized, icon: "waveform") {
-                        Toggle(isOn: $viewModel.useSherpaOnnx) {
-                            Label {
-                                LocalizedText(key: "settings.use_local_model")
-                            } icon: {
-                                Image(systemName: "cpu")
+                        LocalizedText(key: "settings.sherpa_config", font: .headline)
+                            .padding(.top, 4)
+                        
+                        HStack {
+                            LocalizedText(key: "settings.model_path")
+                            Spacer()
+                            Text(viewModel.localModelPath.isEmpty ? "settings.not_selected".localized : viewModel.localModelPath)
+                                .foregroundColor(.secondary)
+                                .lineLimit(1)
+                                .truncationMode(.middle)
+                                .frame(maxWidth: 200, alignment: .trailing)
+                            
+                            Button("settings.choose".localized) {
+                                viewModel.selectLocalModelPath()
                             }
+                            .buttonStyle(BorderedButtonStyle())
                         }
                         
-                        if viewModel.useSherpaOnnx {
-                            Divider()
+                        HStack {
+                            LocalizedText(key: "settings.cache_directory")
+                            Spacer()
+                            Text(viewModel.cacheDirectory.isEmpty ? "settings.default".localized : viewModel.cacheDirectory)
+                                .foregroundColor(.secondary)
+                                .lineLimit(1)
+                                .truncationMode(.middle)
+                                .frame(maxWidth: 200, alignment: .trailing)
                             
-                            LocalizedText(key: "settings.sherpa_config", font: .headline)
-                                .padding(.top, 4)
-                            
-                            HStack {
-                                LocalizedText(key: "settings.model_path")
-                                Spacer()
-                                Text(viewModel.localModelPath.isEmpty ? "settings.not_selected".localized : viewModel.localModelPath)
-                                    .foregroundColor(.secondary)
-                                    .lineLimit(1)
-                                    .truncationMode(.middle)
-                                    .frame(maxWidth: 200, alignment: .trailing)
-                                
-                                Button("settings.choose".localized) {
-                                    viewModel.selectLocalModelPath()
-                                }
-                                .buttonStyle(BorderedButtonStyle())
+                            Button("settings.choose".localized) {
+                                viewModel.selectCacheDirectory()
                             }
-                            
-                            HStack {
-                                LocalizedText(key: "settings.cache_directory")
-                                Spacer()
-                                Text(viewModel.cacheDirectory.isEmpty ? "settings.default".localized : viewModel.cacheDirectory)
-                                    .foregroundColor(.secondary)
-                                    .lineLimit(1)
-                                    .truncationMode(.middle)
-                                    .frame(maxWidth: 200, alignment: .trailing)
-                                
-                                Button("settings.choose".localized) {
-                                    viewModel.selectCacheDirectory()
-                                }
-                                .buttonStyle(BorderedButtonStyle())
-                            }
+                            .buttonStyle(BorderedButtonStyle())
                         }
                     }
                     

@@ -66,6 +66,18 @@
 "history.filter.this_month" = "本月";
 "history.delete_confirm" = "确定要删除此记录吗？";
 "history.delete_message" = "此操作无法撤销。";
+"history.no_results" = "未找到相关记录";
+"history.delete" = "删除";
+"history.share" = "分享";
+"history.export" = "导出";
+"history.minutes" = "分钟";
+"history.seconds" = "秒";
+"history.transcript" = "转录文本";
+"history.ai" = "AI 分析";
+"history.actions" = "操作";
+"history.recording_details" = "录音详情";
+"history.empty" = "暂无录音";
+"history.empty_message" = "您的录音将会显示在这里";
 
 // 设置
 "settings.title" = "设置";

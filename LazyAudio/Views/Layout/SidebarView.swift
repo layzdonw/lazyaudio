@@ -5,17 +5,21 @@ import SwiftUI
 struct SidebarView<Content: View>: View {
     let titleKey: String
     let content: Content
+    let showTitle: Bool
     
-    init(titleKey: String, @ViewBuilder content: () -> Content) {
+    init(titleKey: String, showTitle: Bool = true, @ViewBuilder content: () -> Content) {
         self.titleKey = titleKey
+        self.showTitle = showTitle
         self.content = content()
     }
     
     var body: some View {
         VStack {
-            LocalizedText(key: titleKey, font: .headline)
-                .padding(.top, 20)
-                .padding(.bottom, 10)
+            if showTitle {
+                LocalizedText(key: titleKey, font: .headline)
+                    .padding(.top, 20)
+                    .padding(.bottom, 10)
+            }
             
             content
             
@@ -25,9 +29,16 @@ struct SidebarView<Content: View>: View {
 }
 
 #Preview {
-    SidebarView(titleKey: "history.title") {
-        Text("侧边栏内容")
+    VStack {
+        SidebarView(titleKey: "history.title") {
+            Text("带标题的侧边栏")
+        }
+        .frame(width: 250, height: 250)
+        
+        SidebarView(titleKey: "history.title", showTitle: false) {
+            Text("无标题的侧边栏")
+        }
+        .frame(width: 250, height: 250)
     }
-    .frame(width: 250, height: 500)
     .background(Color(nsColor: .windowBackgroundColor))
 } 

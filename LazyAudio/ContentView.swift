@@ -10,7 +10,7 @@ struct ContentView: View {
         MainLayout(
             left: {
                 // 左侧栏 - 历史记录和快速导航
-                SidebarView(titleKey: "历史记录") {
+                SidebarView(titleKey: "历史记录", showTitle: false) {
                     HistoryView()
                 }
             },

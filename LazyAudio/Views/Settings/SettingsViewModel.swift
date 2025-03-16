@@ -6,7 +6,7 @@ import AppKit
 class SettingsViewModel: ObservableObject {
     @Published var isDarkMode: Bool = false
     @Published var selectedLanguageCode: String = "en"
-    @Published var useSherpaOnnx: Bool = false
+    @Published var useSherpaOnnx: Bool = true
     @Published var selectedAIModel: Int = 0
     @Published var apiKey: String = ""
     @Published var apiBase: String = "https://api.openai.com/v1"
@@ -120,7 +120,7 @@ class SettingsViewModel: ObservableObject {
     func loadSettings() {
         isDarkMode = UserDefaults.standard.bool(forKey: "isDarkMode")
         selectedLanguageCode = UserDefaults.standard.string(forKey: "selectedLanguageCode") ?? LocalizationManager.shared.currentLanguage.rawValue
-        useSherpaOnnx = UserDefaults.standard.bool(forKey: "useSherpaOnnx")
+        useSherpaOnnx = true // 始终使用 SherpaOnnx
         selectedAIModel = UserDefaults.standard.integer(forKey: "selectedAIModel")
         apiKey = UserDefaults.standard.string(forKey: "apiKey") ?? ""
         apiBase = UserDefaults.standard.string(forKey: "apiBase") ?? "https://api.openai.com/v1"

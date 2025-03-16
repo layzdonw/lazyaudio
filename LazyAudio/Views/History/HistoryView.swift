@@ -5,6 +5,7 @@ struct HistoryView: View {
     @State private var selectedRecording: String? = nil
     @State private var isHovering: String? = nil
     @Environment(\.colorScheme) private var colorScheme
+    @State private var selectedFilter: HistoryFilterType = .all
     
     // 模拟数据
     private let recordings = [
@@ -33,8 +34,7 @@ struct HistoryView: View {
             VStack(spacing: 16) {
                 // 页面标题
                 HStack {
-                    Text("历史记录")
-                        .font(.system(size: 28, weight: .bold, design: .rounded))
+                    LocalizedText(key: "history.title", font: .system(size: 28, weight: .bold, design: .rounded))
                         .foregroundColor(.primary)
                     
                     Spacer()
@@ -44,8 +44,7 @@ struct HistoryView: View {
                         // 筛选逻辑
                     }) {
                         HStack(spacing: 6) {
-                            Text("全部")
-                                .font(.system(size: 14, weight: .medium))
+                            LocalizedText(key: selectedFilter.rawValue, font: .system(size: 14, weight: .medium))
                             Image(systemName: "chevron.down")
                                 .font(.system(size: 10, weight: .bold))
                         }
@@ -66,7 +65,7 @@ struct HistoryView: View {
                         .font(.system(size: 16, weight: .medium))
                         .foregroundColor(.secondary)
                     
-                    TextField("搜索会议记录", text: $searchText)
+                    TextField("history.search".localized, text: $searchText)
                         .font(.system(size: 15))
                         .textFieldStyle(PlainTextFieldStyle())
                     
@@ -98,6 +97,11 @@ struct HistoryView: View {
                 .frame(height: 1)
                 .padding(.horizontal, 24)
             
+            // 过滤选项栏
+            HistoryFilterView(selectedFilter: $selectedFilter, searchText: $searchText)
+                .padding(.horizontal, 24)
+                .padding(.vertical, 12)
+            
             // 历史记录列表
             ScrollView {
                 if filteredRecordings.isEmpty {
@@ -106,8 +110,7 @@ struct HistoryView: View {
                             .font(.system(size: 40))
                             .foregroundColor(.secondary.opacity(0.6))
                         
-                        Text("未找到相关记录")
-                            .font(.system(size: 16, weight: .medium))
+                        LocalizedText(key: "history.no_results", font: .system(size: 16, weight: .medium))
                             .foregroundColor(.secondary)
                     }
                     .frame(maxWidth: .infinity)

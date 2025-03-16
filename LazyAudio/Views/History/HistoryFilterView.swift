@@ -2,13 +2,17 @@ import SwiftUI
 
 /// 历史记录过滤类型
 enum HistoryFilterType: String, CaseIterable, Identifiable {
-    case all = "全部"
-    case today = "今天"
-    case yesterday = "昨天"
-    case thisWeek = "本周"
-    case thisMonth = "本月"
+    case all = "history.filter.all"
+    case today = "history.filter.today"
+    case yesterday = "history.filter.yesterday"
+    case thisWeek = "history.filter.this_week"
+    case thisMonth = "history.filter.this_month"
     
     var id: String { self.rawValue }
+    
+    var localizedName: String {
+        return self.rawValue.localized
+    }
 }
 
 /// 历史记录过滤器组件
@@ -24,7 +28,7 @@ struct HistoryFilterView: View {
                 Image(systemName: "magnifyingglass")
                     .foregroundColor(.secondary)
                 
-                TextField("搜索历史记录", text: $searchText)
+                TextField("history.search".localized, text: $searchText)
                     .textFieldStyle(PlainTextFieldStyle())
                 
                 if !searchText.isEmpty {
@@ -46,7 +50,7 @@ struct HistoryFilterView: View {
                 HStack(spacing: 8) {
                     ForEach(HistoryFilterType.allCases) { filter in
                         FilterChip(
-                            title: filter.rawValue,
+                            title: filter.localizedName,
                             isSelected: selectedFilter == filter,
                             action: {
                                 selectedFilter = filter
