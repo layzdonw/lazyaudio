@@ -24,8 +24,6 @@ protocol AudioServiceProtocol {
     /// 停止播放
     func stopAudio()
     
-    /// 获取运行中的应用列表
-    func getRunningApps() -> AnyPublisher<[AppModels.RunningApp], Error>
 }
 
 /// 音频状态
@@ -137,26 +135,5 @@ class AudioService: AudioServiceProtocol {
     func stopAudio() {
         // 取消播放计时器
         cancellables.removeAll()
-    }
-    
-    func getRunningApps() -> AnyPublisher<[AppModels.RunningApp], Error> {
-        // 实际实现中，这里应该调用系统API获取运行中的应用
-        // 这里使用模拟数据
-        let resultSubject = PassthroughSubject<[AppModels.RunningApp], Error>()
-        
-        let apps = [
-            AppModels.RunningApp(name: "Safari", bundleIdentifier: "com.apple.Safari"),
-            AppModels.RunningApp(name: "Music", bundleIdentifier: "com.apple.Music"),
-            AppModels.RunningApp(name: "Zoom", bundleIdentifier: "us.zoom.xos"),
-            AppModels.RunningApp(name: "Chrome", bundleIdentifier: "com.google.Chrome"),
-            AppModels.RunningApp(name: "Slack", bundleIdentifier: "com.slack.Slack")
-        ]
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-            resultSubject.send(apps)
-            resultSubject.send(completion: .finished)
-        }
-        
-        return resultSubject.eraseToAnyPublisher()
     }
 } 

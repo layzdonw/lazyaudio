@@ -53,13 +53,11 @@ class RecordingViewModel: ObservableObject {
     
     /// 加载运行中的应用
     func loadRunningApps() {
-        // 实际实现中，这里应该调用系统API获取运行中的应用
-        // 这里使用模拟数据
-        runningApps = [
-            AppModels.RunningApp(name: "Safari", bundleIdentifier: "com.apple.Safari"),
-            AppModels.RunningApp(name: "Music", bundleIdentifier: "com.apple.Music"),
-            AppModels.RunningApp(name: "Zoom", bundleIdentifier: "us.zoom.xos")
-        ]
+        // 清空现有列表并重新获取
+        runningApps = []
+        DispatchQueue.main.async {
+            self.runningApps = AppModels.getRunningApps()
+        }
     }
     
     /// 开始或停止录音

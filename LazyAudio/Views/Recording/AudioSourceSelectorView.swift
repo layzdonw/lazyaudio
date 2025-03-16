@@ -65,10 +65,7 @@ enum AudioSourceType: Int {
         selectedApp: .constant(""),
         useMicrophone: .constant(false),
         isRecording: false,
-        runningApps: [
-            AppModels.RunningApp(name: "Safari", bundleIdentifier: "com.apple.Safari"),
-            AppModels.RunningApp(name: "Music", bundleIdentifier: "com.apple.Music")
-        ]
+        runningApps: AppModels.getRunningApps()
     )
     .padding()
 } 

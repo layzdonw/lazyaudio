@@ -54,7 +54,7 @@ struct ContentView: View {
             SettingsView()
         }
         .sheet(isPresented: $showNewSession) {
-            TempNewSessionView()
+            NewSessionView()
         }
         .preferredColorScheme(isDarkMode ? .dark : .light)
     }
