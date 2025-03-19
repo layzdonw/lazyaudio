@@ -2,7 +2,7 @@ import SwiftUI
 import AppKit
 
 struct RecordingView: View {
-    @StateObject private var viewModel = RecordingViewModel()
+    @State private var viewModel = RecordingViewModel()
     
     var body: some View {
         VStack(spacing: 0) {
@@ -22,7 +22,10 @@ struct RecordingView: View {
                 
                 // 录制控制按钮
                 RecordingControlsView(
-                    isRecording: $viewModel.isRecording,
+                    isRecording: Binding(
+                        get: { viewModel.isRecording },
+                        set: { _ in viewModel.toggleRecording() }
+                    ),
                     canStartRecording: viewModel.canStartRecording
                 )
             }
@@ -32,11 +35,11 @@ struct RecordingView: View {
             Divider()
             
             // 转录内容显示区
-            if viewModel.showTranscription {
+            if viewModel.isRecording {
                 VStack(spacing: 0) {
                     // 转录内容
                     TranscriptionDisplayView(
-                        selectedText: $viewModel.selectedText
+                        selectedText: .constant("正在录制...")
                     )
                 }
             } else {
@@ -45,6 +48,18 @@ struct RecordingView: View {
         }
         .onAppear {
             viewModel.loadRunningApps()
+        }
+        .alert("录制错误", isPresented: Binding(
+            get: { viewModel.errorMessage != nil },
+            set: { if !$0 { viewModel.errorMessage = nil } }
+        )) {
+            Button("确定") {
+                viewModel.errorMessage = nil
+            }
+        } message: {
+            if let errorMessage = viewModel.errorMessage {
+                Text(errorMessage)
+            }
         }
     }
 }

@@ -13,6 +13,8 @@ class RecordingViewModel: ObservableObject {
     @Published var isRecording: Bool = false
     @Published var showTranscription: Bool = false
     @Published var selectedText: String = ""
+    @Published var errorMessage: String?
+    @Published var recordingDuration: TimeInterval = 0
     
     // 应用列表
     @Published var runningApps: [AppModels.RunningApp] = []
@@ -26,8 +28,10 @@ class RecordingViewModel: ObservableObject {
     }
     
     private var cancellables = Set<AnyCancellable>()
+    private let audioService: AudioServiceProtocol
     
-    init() {
+    init(audioService: AudioServiceProtocol = AudioService()) {
+        self.audioService = audioService
         setupBindings()
     }
     
@@ -66,24 +70,58 @@ class RecordingViewModel: ObservableObject {
             return // 如果不能开始录制且当前未录制，则不执行操作
         }
         
-        isRecording.toggle()
-        
         if isRecording {
-            // 开始录音的逻辑
-            startRecording()
-        } else {
-            // 停止录音的逻辑
             stopRecording()
+        } else {
+            startRecording()
         }
     }
     
     private func startRecording() {
-        // 实现开始录音的具体逻辑
-        print("开始录音: 音频源=\(audioSourceType), 应用=\(selectedApp), 麦克风=\(useMicrophone)")
+        // 开始录音
+        audioService.startRecording(
+            sourceType: audioSourceType,
+            appBundleId: selectedApp.isEmpty ? nil : selectedApp,
+            useMicrophone: useMicrophone
+        )
+        .receive(on: DispatchQueue.main)
+        .sink { [weak self] completion in
+            if case .failure(let error) = completion {
+                self?.errorMessage = error.localizedDescription
+                self?.isRecording = false
+            }
+        } receiveValue: { [weak self] status in
+            switch status {
+            case .preparing:
+                self?.isRecording = false
+            case .recording(let duration):
+                self?.isRecording = true
+                self?.recordingDuration = duration
+            case .paused:
+                self?.isRecording = false
+            case .stopped:
+                self?.isRecording = false
+            case .error(let message):
+                self?.errorMessage = message
+                self?.isRecording = false
+            }
+        }
+        .store(in: &cancellables)
     }
     
     private func stopRecording() {
-        // 实现停止录音的具体逻辑
-        print("停止录音")
+        // 停止录音
+        audioService.stopRecording()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] completion in
+                if case .failure(let error) = completion {
+                    self?.errorMessage = error.localizedDescription
+                }
+                self?.isRecording = false
+            } receiveValue: { [weak self] url in
+                // 处理录音文件
+                print("录音文件保存到: \(url)")
+            }
+            .store(in: &cancellables)
     }
 } 
