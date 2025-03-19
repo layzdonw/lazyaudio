@@ -10,8 +10,6 @@ struct NewSessionView: View {
     @State private var selectedLanguage: Int = 0
     @State private var runningApps: [AppModels.RunningApp] = []
     
-    private let languages = ["简体中文", "English", "日本語", "한국어"]
-    
     enum AudioSourceType: Int {
         case systemAudio = 0
         case appAudio = 1
@@ -88,19 +86,6 @@ struct NewSessionView: View {
                     }
                 }
                 .padding(.leading, 4)
-            }
-            
-            // 语言选择
-            VStack(alignment: .leading, spacing: 8) {
-                Text("转录语言")
-                    .font(.headline)
-                
-                Picker("", selection: $selectedLanguage) {
-                    ForEach(0..<languages.count, id: \.self) { index in
-                        Text(languages[index]).tag(index)
-                    }
-                }
-                .pickerStyle(SegmentedPickerStyle())
             }
             
             Spacer()
