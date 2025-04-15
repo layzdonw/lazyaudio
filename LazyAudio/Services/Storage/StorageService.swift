@@ -22,6 +22,9 @@ protocol StorageServiceProtocol {
     /// 更新录音会话
     /// - Parameter session: 录音会话
     func updateRecordingSession(_ session: RecordingSession) -> AnyPublisher<Void, Error>
+    
+    /// 获取录音文件存储目录
+    var recordingsDirectory: URL { get }
 }
 
 /// 录音会话
@@ -78,10 +81,15 @@ struct TranscriptionSegment: Identifiable, Codable {
 /// 存储服务实现
 class StorageService: StorageServiceProtocol {
     private let fileManager = FileManager.default
-    private let documentsURL: URL
+    private let settingsService: SettingsServiceProtocol
     
-    init() {
-        documentsURL = fileManager.urls(for: .documentDirectory, in: .userDomainMask)[0]
+    /// 获取录音文件存储目录
+    var recordingsDirectory: URL {
+        return settingsService.recordingsDirectory
+    }
+    
+    init(settingsService: SettingsServiceProtocol = SettingsService()) {
+        self.settingsService = settingsService
     }
     
     func saveRecordingSession(_ session: RecordingSession) -> AnyPublisher<Void, Error> {
@@ -89,7 +97,7 @@ class StorageService: StorageServiceProtocol {
         
         do {
             // 创建会话目录
-            let sessionDirectoryURL = documentsURL.appendingPathComponent("Sessions").appendingPathComponent(session.id)
+            let sessionDirectoryURL = recordingsDirectory.appendingPathComponent(session.id)
             try fileManager.createDirectory(at: sessionDirectoryURL, withIntermediateDirectories: true)
             
             // 保存会话元数据
@@ -122,11 +130,9 @@ class StorageService: StorageServiceProtocol {
             guard let self = self else { return }
             
             do {
-                let sessionsDirectoryURL = self.documentsURL.appendingPathComponent("Sessions")
-                
                 // 如果目录不存在，创建它并返回空数组
-                if !self.fileManager.fileExists(atPath: sessionsDirectoryURL.path) {
-                    try self.fileManager.createDirectory(at: sessionsDirectoryURL, withIntermediateDirectories: true)
+                if !self.fileManager.fileExists(atPath: self.recordingsDirectory.path) {
+                    try self.fileManager.createDirectory(at: self.recordingsDirectory, withIntermediateDirectories: true)
                     DispatchQueue.main.async {
                         resultSubject.send([])
                         resultSubject.send(completion: .finished)
@@ -135,7 +141,7 @@ class StorageService: StorageServiceProtocol {
                 }
                 
                 // 获取所有会话目录
-                let sessionDirectories = try self.fileManager.contentsOfDirectory(at: sessionsDirectoryURL, includingPropertiesForKeys: nil)
+                let sessionDirectories = try self.fileManager.contentsOfDirectory(at: self.recordingsDirectory, includingPropertiesForKeys: nil)
                 
                 var sessions: [RecordingSession] = []
                 
@@ -175,7 +181,7 @@ class StorageService: StorageServiceProtocol {
             guard let self = self else { return }
             
             do {
-                let sessionDirectoryURL = self.documentsURL.appendingPathComponent("Sessions").appendingPathComponent(id)
+                let sessionDirectoryURL = self.recordingsDirectory.appendingPathComponent(id)
                 let metadataURL = sessionDirectoryURL.appendingPathComponent("metadata.json")
                 
                 if self.fileManager.fileExists(atPath: metadataURL.path) {
@@ -211,7 +217,7 @@ class StorageService: StorageServiceProtocol {
             guard let self = self else { return }
             
             do {
-                let sessionDirectoryURL = self.documentsURL.appendingPathComponent("Sessions").appendingPathComponent(id)
+                let sessionDirectoryURL = self.recordingsDirectory.appendingPathComponent(id)
                 
                 if self.fileManager.fileExists(atPath: sessionDirectoryURL.path) {
                     try self.fileManager.removeItem(at: sessionDirectoryURL)
@@ -238,7 +244,7 @@ class StorageService: StorageServiceProtocol {
             guard let self = self else { return }
             
             do {
-                let sessionDirectoryURL = self.documentsURL.appendingPathComponent("Sessions").appendingPathComponent(session.id)
+                let sessionDirectoryURL = self.recordingsDirectory.appendingPathComponent(session.id)
                 let metadataURL = sessionDirectoryURL.appendingPathComponent("metadata.json")
                 
                 if self.fileManager.fileExists(atPath: metadataURL.path) {

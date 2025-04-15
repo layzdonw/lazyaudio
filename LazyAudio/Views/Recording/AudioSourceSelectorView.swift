@@ -1,4 +1,5 @@
 import SwiftUI
+import AppKit
 
 /// 音频源选择组件
 /// 用于选择录音的音频源
@@ -10,56 +11,36 @@ struct AudioSourceSelectorView: View {
     let runningApps: [AppModels.RunningApp]
     
     var body: some View {
-        VStack(spacing: 12) {
-            // 系统音频和应用音频二选一
-            HStack {
-                LocalizedText(key: "recording.audio_source", font: .subheadline)
-                    .foregroundColor(.secondary)
-                
-                Picker("", selection: $audioSourceType) {
-                    LocalizedText(key: "recording.system_audio").tag(AudioSourceType.systemAudio)
-                    LocalizedText(key: "recording.app_audio").tag(AudioSourceType.appAudio)
-                }
-                .pickerStyle(SegmentedPickerStyle())
-                .frame(width: 200)
-                .disabled(isRecording)
-                
-                if audioSourceType == .appAudio {
-                    Picker("", selection: $selectedApp) {
-                        LocalizedText(key: "recording.select_app").tag("")
-                        ForEach(runningApps) { app in
-                            Text(app.name).tag(app.bundleIdentifier)
-                        }
+        VStack(alignment: .leading, spacing: 12) {
+            // 音频源类型选择
+            Picker("音频源", selection: $audioSourceType) {
+                Text("系统音频").tag(AudioSourceType.systemAudio)
+                Text("应用音频").tag(AudioSourceType.appAudio)
+                Text("麦克风").tag(AudioSourceType.microphone)
+            }
+            .pickerStyle(.segmented)
+            .disabled(isRecording)
+            
+            // 应用选择器（仅在应用音频模式下显示）
+            if audioSourceType == .appAudio {
+                Picker("选择应用", selection: $selectedApp) {
+                    Text("请选择应用").tag("")
+                    ForEach(runningApps) { app in
+                        Text(app.name).tag(app.bundleIdentifier)
                     }
-                    .pickerStyle(MenuPickerStyle())
-                    .frame(width: 200)
-                    .disabled(isRecording)
                 }
-                
-                Spacer()
+                .pickerStyle(.menu)
+                .disabled(isRecording)
             }
             
-            // 麦克风选项（独立选项）
-            HStack {
-                Toggle(isOn: $useMicrophone) {
-                    Label {
-                        LocalizedText(key: "recording.use_microphone")
-                    } icon: {
-                        Image(systemName: "mic.fill")
-                    }
-                }
-                .disabled(isRecording)
-                
-                Spacer()
+            // 麦克风选项（仅在系统音频或应用音频模式下显示）
+            if audioSourceType == .systemAudio || audioSourceType == .appAudio {
+                Toggle("同时录制麦克风", isOn: $useMicrophone)
+                    .disabled(isRecording)
             }
         }
+        .padding(.horizontal)
     }
-}
-
-/// 音频源类型
-enum AudioSourceType: Int {
-    case systemAudio = 0
-    case appAudio = 1
 }
 
 #Preview {
@@ -68,7 +49,6 @@ enum AudioSourceType: Int {
         selectedApp: .constant(""),
         useMicrophone: .constant(false),
         isRecording: false,
-        runningApps: AppModels.getRunningApps()
+        runningApps: []
     )
-    .padding()
 } 

@@ -6,6 +6,8 @@ struct TranscriptionDisplayView: View {
     @State private var showAIModal = false
     @State private var modalTitle = ""
     @State private var modalSystemImage = ""
+    private let storageService = StorageService()
+    private let settingsService = SettingsService()
     
     init(selectedText: Binding<String> = .constant("")) {
         self._selectedText = selectedText
@@ -25,6 +27,37 @@ struct TranscriptionDisplayView: View {
                         .fontWeight(.bold)
                         .foregroundColor(.primary)
                 }
+                
+                // 录音文件存储位置
+                HStack(spacing: 8) {
+                    Image(systemName: "folder.fill")
+                        .font(.system(size: 12))
+                        .foregroundColor(.secondary)
+                    
+                    Text("录音文件：")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                    
+                    Text(getRecordingFilePath())
+                        .font(.caption)
+                        .foregroundColor(.primary)
+                        .lineLimit(1)
+                        .truncationMode(.middle)
+                    
+                    Button(action: {
+                        NSPasteboard.general.clearContents()
+                        NSPasteboard.general.setString(getRecordingFilePath(), forType: .string)
+                    }) {
+                        Image(systemName: "doc.on.doc")
+                            .font(.system(size: 12))
+                            .foregroundColor(.blue)
+                    }
+                    .buttonStyle(.plain)
+                }
+                .padding(.horizontal, 8)
+                .padding(.vertical, 4)
+                .background(Color(nsColor: .controlBackgroundColor))
+                .cornerRadius(4)
                 
                 Spacer()
                 
@@ -143,6 +176,11 @@ struct TranscriptionDisplayView: View {
                 isPresented: $showAIModal
             )
         }
+    }
+    
+    // 获取录音文件存储路径
+    private func getRecordingFilePath() -> String {
+        return settingsService.recordingsDirectory.path
     }
 }
 

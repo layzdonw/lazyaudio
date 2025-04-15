@@ -2,7 +2,7 @@ import SwiftUI
 import AppKit
 
 struct RecordingView: View {
-    @State private var viewModel = RecordingViewModel()
+    @StateObject private var viewModel = RecordingViewModel()
     
     var body: some View {
         VStack(spacing: 0) {

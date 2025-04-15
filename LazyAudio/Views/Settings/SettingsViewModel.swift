@@ -4,38 +4,84 @@ import Foundation
 import AppKit
 
 class SettingsViewModel: ObservableObject {
+    // 通用设置
     @Published var isDarkMode: Bool = false
     @Published var selectedLanguageCode: String = "en"
-    @Published var useSherpaOnnx: Bool = true
+    @Published var fontSize: Int = 1 // 0: 小, 1: 中, 2: 大
+    
+    // 转录设置
+    @Published var localModelPath: String = ""
+    @Published var cacheDirectory: String = ""
+    
+    // AI 设置
     @Published var selectedAIModel: Int = 0
     @Published var apiKey: String = ""
     @Published var apiBase: String = "https://api.openai.com/v1"
-    @Published var localModelPath: String = ""
-    @Published var cacheDirectory: String = ""
     @Published var modelTemperature: Double = 0.7
     @Published var maxTokens: Int = 2048
+    
+    // 存储设置
     @Published var storagePath: String = ""
     @Published var autoCleanup: Bool = true
     @Published var retentionPeriod: Int = 30
-    @Published var fontSize: Int = 1 // 0: 小, 1: 中, 2: 大
     
-    private var cancellables = Set<AnyCancellable>()
+    // 错误处理
+    @Published var showError: Bool = false
+    @Published var errorMessage: String? = nil
     
-    init() {
+    // 状态跟踪
+    @Published var isChangingDirectory: Bool = false
+    
+    var cancellables = Set<AnyCancellable>()
+    let settingsService: SettingsServiceProtocol
+    
+    init(settingsService: SettingsServiceProtocol = SettingsService()) {
+        self.settingsService = settingsService
         loadSettings()
         
         // 监听语言变化通知
         NotificationCenter.default.publisher(for: Notification.Name("LanguageChanged"))
             .sink { [weak self] _ in
-                self?.saveSettings()
+                self?.saveSelectedLanguage()
             }
             .store(in: &cancellables)
     }
     
-    private func updateAppearance() {
-        // 在实际应用中，这里需要实现深色模式切换逻辑
-        // 由于 SwiftUI 的限制，可能需要通过 AppDelegate 或其他方式实现
+    // MARK: - 设置加载
+    
+    func loadSettings() {
+        isDarkMode = settingsService.isDarkMode
+        selectedLanguageCode = settingsService.selectedLanguageCode
+        fontSize = settingsService.fontSize
+        
+        localModelPath = settingsService.localModelPath?.path ?? ""
+        cacheDirectory = settingsService.cacheDirectory?.path ?? ""
+        
+        selectedAIModel = settingsService.selectedAIModel
+        apiKey = settingsService.apiKey
+        apiBase = settingsService.apiBase
+        modelTemperature = settingsService.modelTemperature
+        maxTokens = settingsService.maxTokens
+        
+        storagePath = settingsService.storagePath?.path ?? ""
+        autoCleanup = settingsService.autoCleanup
+        retentionPeriod = settingsService.retentionPeriod
+        
+        // 验证存储路径是否生效
+        print("当前存储路径: \(storagePath)")
+        print("实际存储路径: \(settingsService.storagePath?.path ?? "未设置")")
+        print("录音文件目录: \(settingsService.recordingsDirectory.path)")
     }
+    
+    // MARK: - 设置保存
+    
+    private func saveSelectedLanguage() {
+        settingsService.setLanguage(selectedLanguageCode)
+            .sink { _ in }
+            .store(in: &cancellables)
+    }
+    
+    // MARK: - 文件选择
     
     func selectLocalModelPath() {
         let openPanel = NSOpenPanel()
@@ -45,10 +91,21 @@ class SettingsViewModel: ObservableObject {
         openPanel.canChooseFiles = true
         openPanel.allowedFileTypes = ["onnx"]
         
-        if openPanel.runModal() == .OK {
-            if let url = openPanel.url {
-                self.localModelPath = url.path
-            }
+        if openPanel.runModal() == .OK, let url = openPanel.url {
+            isChangingDirectory = true
+            settingsService.setLocalModelPath(url)
+                .receive(on: DispatchQueue.main)
+                .sink { [weak self] completion in
+                    guard let self = self else { return }
+                    self.isChangingDirectory = false
+                    
+                    if case .failure(let error) = completion {
+                        self.showError(message: error.localizedDescription)
+                    }
+                } receiveValue: { [weak self] _ in
+                    self?.localModelPath = url.path
+                }
+                .store(in: &cancellables)
         }
     }
     
@@ -58,11 +115,23 @@ class SettingsViewModel: ObservableObject {
         openPanel.allowsMultipleSelection = false
         openPanel.canChooseDirectories = true
         openPanel.canChooseFiles = false
+        openPanel.canCreateDirectories = true
         
-        if openPanel.runModal() == .OK {
-            if let url = openPanel.url {
-                self.cacheDirectory = url.path
-            }
+        if openPanel.runModal() == .OK, let url = openPanel.url {
+            isChangingDirectory = true
+            settingsService.setCacheDirectory(url)
+                .receive(on: DispatchQueue.main)
+                .sink { [weak self] completion in
+                    guard let self = self else { return }
+                    self.isChangingDirectory = false
+                    
+                    if case .failure(let error) = completion {
+                        self.showError(message: error.localizedDescription)
+                    }
+                } receiveValue: { [weak self] _ in
+                    self?.cacheDirectory = url.path
+                }
+                .store(in: &cancellables)
         }
     }
     
@@ -72,13 +141,151 @@ class SettingsViewModel: ObservableObject {
         openPanel.allowsMultipleSelection = false
         openPanel.canChooseDirectories = true
         openPanel.canChooseFiles = false
+        openPanel.canCreateDirectories = true
         
-        if openPanel.runModal() == .OK {
-            if let url = openPanel.url {
-                self.storagePath = url.path
-            }
+        if openPanel.runModal() == .OK, let url = openPanel.url {
+            isChangingDirectory = true
+            settingsService.setStoragePath(url)
+                .receive(on: DispatchQueue.main)
+                .sink { [weak self] completion in
+                    guard let self = self else { return }
+                    self.isChangingDirectory = false
+                    
+                    if case .failure(let error) = completion {
+                        self.showError(message: error.localizedDescription)
+                    }
+                } receiveValue: { [weak self] _ in
+                    self?.storagePath = url.path
+                }
+                .store(in: &cancellables)
         }
     }
+    
+    // MARK: - 设置更新
+    
+    func updateDarkMode() {
+        settingsService.setDarkMode(isDarkMode)
+            .sink { _ in }
+            .store(in: &cancellables)
+    }
+    
+    func updateFontSize() {
+        settingsService.setFontSize(fontSize)
+            .sink { _ in }
+            .store(in: &cancellables)
+    }
+    
+    func updateAIModel() {
+        settingsService.setAIModel(selectedAIModel)
+            .sink { _ in }
+            .store(in: &cancellables)
+    }
+    
+    func updateAPIKey() {
+        settingsService.setAPIKey(apiKey)
+            .sink { _ in }
+            .store(in: &cancellables)
+    }
+    
+    func updateAPIBase() {
+        settingsService.setAPIBase(apiBase)
+            .sink { _ in }
+            .store(in: &cancellables)
+    }
+    
+    func updateModelTemperature() {
+        settingsService.setModelTemperature(modelTemperature)
+            .sink { _ in }
+            .store(in: &cancellables)
+    }
+    
+    func updateMaxTokens() {
+        settingsService.setMaxTokens(maxTokens)
+            .sink { _ in }
+            .store(in: &cancellables)
+    }
+    
+    func updateAutoCleanup() {
+        settingsService.setAutoCleanup(autoCleanup)
+            .sink { _ in }
+            .store(in: &cancellables)
+    }
+    
+    func updateRetentionPeriod() {
+        settingsService.setRetentionPeriod(retentionPeriod)
+            .sink { _ in }
+            .store(in: &cancellables)
+    }
+    
+    func updateStoragePath() {
+        if !storagePath.isEmpty, let url = URL(string: storagePath) {
+            isChangingDirectory = true
+            settingsService.setStoragePath(url)
+                .receive(on: DispatchQueue.main)
+                .sink { [weak self] completion in
+                    guard let self = self else { return }
+                    self.isChangingDirectory = false
+                    
+                    if case .failure(let error) = completion {
+                        self.showError(message: error.localizedDescription)
+                    }
+                } receiveValue: { _ in }
+                .store(in: &cancellables)
+        }
+    }
+    
+    func resetStoragePath() {
+        // 使用Documents目录作为默认路径
+        let documentsPath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+        
+        isChangingDirectory = true
+        settingsService.setStoragePath(documentsPath)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] completion in
+                guard let self = self else { return }
+                self.isChangingDirectory = false
+                
+                if case .failure(let error) = completion {
+                    self.showError(message: error.localizedDescription)
+                }
+            } receiveValue: { [weak self] _ in
+                self?.storagePath = documentsPath.path
+                print("已重置存储路径为文档目录: \(documentsPath.path)")
+            }
+            .store(in: &cancellables)
+    }
+    
+    func testStoragePath() {
+        print("=== 存储路径测试 ===")
+        print("当前路径: \(storagePath)")
+        
+        if let url = settingsService.storagePath {
+            let success = url.startAccessingSecurityScopedResource()
+            print("访问URL: \(url.path), 结果: \(success ? "成功" : "失败")")
+            
+            let recordingsDir = settingsService.recordingsDirectory
+            print("录音目录: \(recordingsDir.path)")
+            
+            // 测试写入
+            do {
+                let testFile = recordingsDir.appendingPathComponent("test.txt")
+                try "测试内容".write(to: testFile, atomically: true, encoding: .utf8)
+                print("测试文件创建成功: \(testFile.path)")
+                try FileManager.default.removeItem(at: testFile)
+                print("测试文件删除成功")
+            } catch {
+                print("测试文件操作失败: \(error.localizedDescription)")
+            }
+            
+            url.stopAccessingSecurityScopedResource()
+        } else {
+            print("存储路径未设置")
+        }
+        
+        print("=== 测试结束 ===")
+    }
+    
+    // MARK: - 其他功能
     
     func checkForUpdates() {
         // 模拟检查更新
@@ -97,44 +304,10 @@ class SettingsViewModel: ObservableObject {
         }
     }
     
-    // 保存设置
-    func saveSettings() {
-        // 这里实现保存设置到UserDefaults或其他存储
-        UserDefaults.standard.set(isDarkMode, forKey: "isDarkMode")
-        UserDefaults.standard.set(selectedLanguageCode, forKey: "selectedLanguageCode")
-        UserDefaults.standard.set(useSherpaOnnx, forKey: "useSherpaOnnx")
-        UserDefaults.standard.set(selectedAIModel, forKey: "selectedAIModel")
-        UserDefaults.standard.set(apiKey, forKey: "apiKey")
-        UserDefaults.standard.set(apiBase, forKey: "apiBase")
-        UserDefaults.standard.set(localModelPath, forKey: "localModelPath")
-        UserDefaults.standard.set(cacheDirectory, forKey: "cacheDirectory")
-        UserDefaults.standard.set(modelTemperature, forKey: "modelTemperature")
-        UserDefaults.standard.set(maxTokens, forKey: "maxTokens")
-        UserDefaults.standard.set(storagePath, forKey: "storagePath")
-        UserDefaults.standard.set(autoCleanup, forKey: "autoCleanup")
-        UserDefaults.standard.set(retentionPeriod, forKey: "retentionPeriod")
-        UserDefaults.standard.set(fontSize, forKey: "fontSize")
-    }
+    // MARK: - 错误处理
     
-    // 加载设置
-    func loadSettings() {
-        isDarkMode = UserDefaults.standard.bool(forKey: "isDarkMode")
-        selectedLanguageCode = UserDefaults.standard.string(forKey: "selectedLanguageCode") ?? LocalizationManager.shared.currentLanguage.rawValue
-        useSherpaOnnx = true // 始终使用 SherpaOnnx
-        selectedAIModel = UserDefaults.standard.integer(forKey: "selectedAIModel")
-        apiKey = UserDefaults.standard.string(forKey: "apiKey") ?? ""
-        apiBase = UserDefaults.standard.string(forKey: "apiBase") ?? "https://api.openai.com/v1"
-        localModelPath = UserDefaults.standard.string(forKey: "localModelPath") ?? ""
-        cacheDirectory = UserDefaults.standard.string(forKey: "cacheDirectory") ?? ""
-        modelTemperature = UserDefaults.standard.double(forKey: "modelTemperature")
-        if modelTemperature == 0 { modelTemperature = 0.7 } // 默认值
-        maxTokens = UserDefaults.standard.integer(forKey: "maxTokens")
-        if maxTokens == 0 { maxTokens = 2048 } // 默认值
-        storagePath = UserDefaults.standard.string(forKey: "storagePath") ?? ""
-        autoCleanup = UserDefaults.standard.bool(forKey: "autoCleanup")
-        retentionPeriod = UserDefaults.standard.integer(forKey: "retentionPeriod")
-        if retentionPeriod == 0 { retentionPeriod = 30 } // 默认值
-        fontSize = UserDefaults.standard.integer(forKey: "fontSize")
-        if fontSize == 0 { fontSize = 1 } // 默认为中等大小
+    private func showError(message: String) {
+        self.errorMessage = message
+        self.showError = true
     }
 } 

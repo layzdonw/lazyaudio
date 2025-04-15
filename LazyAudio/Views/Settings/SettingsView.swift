@@ -38,31 +38,6 @@ struct SettingsView: View {
             // 设置内容
             ScrollView {
                 VStack(spacing: 20) {
-                    // 外观设置
-                    SettingsSection(title: "settings.general".localized, icon: "paintbrush.fill") {
-                        Toggle(isOn: $viewModel.isDarkMode) {
-                            Label {
-                                LocalizedText(key: "settings.dark_mode")
-                            } icon: {
-                                Image(systemName: "moon.fill")
-                            }
-                        }
-                        
-                        Divider()
-                        
-                        HStack {
-                            LocalizedText(key: "settings.font_size")
-                            Spacer()
-                            Picker("", selection: $viewModel.fontSize) {
-                                LocalizedText(key: "settings.font_size.small").tag(0)
-                                LocalizedText(key: "settings.font_size.medium").tag(1)
-                                LocalizedText(key: "settings.font_size.large").tag(2)
-                            }
-                            .pickerStyle(SegmentedPickerStyle())
-                            .frame(width: 180)
-                        }
-                    }
-                    
                     // 语言设置
                     SettingsSection(title: "settings.language".localized, icon: "globe") {
                         Picker("", selection: $viewModel.selectedLanguageCode) {
@@ -126,6 +101,9 @@ struct SettingsView: View {
                                 Text("Gemini").tag(3)
                             }
                             .pickerStyle(MenuPickerStyle())
+                            .onChange(of: viewModel.selectedAIModel) { _ in
+                                viewModel.updateAIModel()
+                            }
                         }
                         
                         Divider()
@@ -139,6 +117,9 @@ struct SettingsView: View {
                             SecureField("settings.enter_api_key".localized, text: $viewModel.apiKey)
                                 .frame(width: 250)
                                 .textFieldStyle(RoundedBorderTextFieldStyle())
+                                .onChange(of: viewModel.apiKey) { _ in
+                                    viewModel.updateAPIKey()
+                                }
                         }
                         
                         HStack {
@@ -147,6 +128,9 @@ struct SettingsView: View {
                             TextField("settings.enter_api_base".localized, text: $viewModel.apiBase)
                                 .frame(width: 250)
                                 .textFieldStyle(RoundedBorderTextFieldStyle())
+                                .onChange(of: viewModel.apiBase) { _ in
+                                    viewModel.updateAPIBase()
+                                }
                         }
                         
                         Divider()
@@ -158,6 +142,9 @@ struct SettingsView: View {
                             LocalizedText(key: "settings.temperature")
                             Slider(value: $viewModel.modelTemperature, in: 0...1, step: 0.1)
                                 .frame(width: 200)
+                                .onChange(of: viewModel.modelTemperature) { _ in
+                                    viewModel.updateModelTemperature()
+                                }
                             Text(String(format: "%.1f", viewModel.modelTemperature))
                                 .frame(width: 30)
                         }
@@ -172,6 +159,9 @@ struct SettingsView: View {
                             }
                             .pickerStyle(MenuPickerStyle())
                             .frame(width: 100)
+                            .onChange(of: viewModel.maxTokens) { _ in
+                                viewModel.updateMaxTokens()
+                            }
                         }
                     }
                     
@@ -190,12 +180,29 @@ struct SettingsView: View {
                                 viewModel.selectStoragePath()
                             }
                             .buttonStyle(BorderedButtonStyle())
+                            
+                            Button("重置") {
+                                viewModel.resetStoragePath()
+                            }
+                            .buttonStyle(BorderedButtonStyle())
                         }
+                        .onChange(of: viewModel.storagePath) { _ in
+                            // 确保路径变化时调用更新方法
+                            // 注意：这里不需要手动调用，因为selectStoragePath方法已包含更新逻辑
+                        }
+                        
+                        Button("测试路径") {
+                            viewModel.testStoragePath()
+                        }
+                        .buttonStyle(BorderedButtonStyle())
                         
                         Divider()
                         
                         Toggle(isOn: $viewModel.autoCleanup) {
                             LocalizedText(key: "settings.auto_cleanup")
+                        }
+                        .onChange(of: viewModel.autoCleanup) { _ in
+                            viewModel.updateAutoCleanup()
                         }
                         
                         if viewModel.autoCleanup {
