@@ -4,6 +4,8 @@ import AVFoundation
 import AudioToolbox
 import OSLog
 import AppKit
+import UniformTypeIdentifiers
+import Darwin
 
 /// 音频源类型
 enum AudioSourceType: Int {
@@ -45,6 +47,15 @@ protocol AudioServiceProtocol {
     
     /// 移除所有音频处理插件
     func removeAllProcessingPlugins()
+    
+    /// 获取当前运行的应用列表
+    func getRunningApps() -> [AppModels.RunningApp]
+    
+    /// 刷新应用和音频进程列表
+    func refreshAudioProcesses()
+    
+    /// 获取所有音频进程
+    var audioProcesses: [AudioProcess] { get }
 }
 
 /// 音频状态
@@ -67,7 +78,7 @@ enum AudioPlaybackStatus {
 }
 
 /// 错误扩展
-extension String: LocalizedError {
+extension String: Error, LocalizedError {
     public var errorDescription: String? { self }
 }
 
@@ -98,7 +109,47 @@ extension AudioObjectID {
         err = AudioObjectGetPropertyData(self, &address, 0, nil, &dataSize, &value)
         guard err == noErr else { throw "获取进程列表数据错误: \(err)" }
         
-        return value
+        return value.filter { $0.isValid }
+    }
+    
+    /// 获取当前运行的具有音频功能的进程列表
+    static func readAudioProcessesFromCurrentlyRunningProcesses() throws -> [AudioObjectID] {
+        var address = AudioObjectPropertyAddress(
+            mSelector: kAudioHardwarePropertyProcessObjectList,
+            mScope: kAudioObjectPropertyScopeGlobal,
+            mElement: kAudioObjectPropertyElementMain
+        )
+        
+        var propertySize: UInt32 = 0
+        var err = AudioObjectGetPropertyDataSize(
+            AudioObjectID.system,
+            &address,
+            0, 
+            nil,
+            &propertySize
+        )
+        
+        guard err == noErr else {
+            throw "获取音频进程列表大小错误: \(err)"
+        }
+        
+        let processCount = Int(propertySize) / MemoryLayout<AudioObjectID>.size
+        var processIDs = [AudioObjectID](repeating: 0, count: processCount)
+        
+        err = AudioObjectGetPropertyData(
+            AudioObjectID.system,
+            &address,
+            0,
+            nil,
+            &propertySize,
+            &processIDs
+        )
+        
+        guard err == noErr else {
+            throw "获取音频进程列表错误: \(err)"
+        }
+        
+        return processIDs.filter { $0.isValid }
     }
     
     static func translatePIDToAudioObjectID(pid: pid_t) throws -> AudioObjectID {
@@ -113,7 +164,7 @@ extension AudioObjectID {
         )
         
         var qualifierPid = pid
-        var qualifierSize = UInt32(MemoryLayout<pid_t>.size)
+        let qualifierSize = UInt32(MemoryLayout<pid_t>.size)
         var dataSize = UInt32(MemoryLayout<AudioObjectID>.size)
         var objectID = AudioObjectID.unknown
         
@@ -139,6 +190,39 @@ extension AudioObjectID {
         return nil
     }
     
+    /// 检查进程是否正在产生音频
+    func readProcessIsRunning() -> Bool {
+        (try? readBool(kAudioProcessPropertyIsRunning)) ?? false
+    }
+    
+    /// 读取进程的PID
+    func readProcessPID() -> pid_t? {
+        try? read(kAudioProcessPropertyPID, defaultValue: -1)
+    }
+    
+    func readBool(_ selector: AudioObjectPropertySelector) throws -> Bool {
+        let value: UInt32 = try read(selector, defaultValue: 0)
+        return value == 1
+    }
+    
+    func read<T>(_ selector: AudioObjectPropertySelector, defaultValue: T) throws -> T {
+        var address = AudioObjectPropertyAddress(
+            mSelector: selector,
+            mScope: kAudioObjectPropertyScopeGlobal,
+            mElement: kAudioObjectPropertyElementMain
+        )
+        
+        var dataSize: UInt32 = 0
+        var err = AudioObjectGetPropertyDataSize(self, &address, 0, nil, &dataSize)
+        guard err == noErr else { throw "获取属性数据大小错误: \(err)" }
+        
+        var value: T = defaultValue
+        err = AudioObjectGetPropertyData(self, &address, 0, nil, &dataSize, &value)
+        guard err == noErr else { throw "获取属性数据错误: \(err)" }
+        
+        return value
+    }
+    
     func readString(_ selector: AudioObjectPropertySelector) throws -> String {
         var address = AudioObjectPropertyAddress(
             mSelector: selector,
@@ -159,11 +243,90 @@ extension AudioObjectID {
 }
 
 /// 进程信息模型
-struct AudioProcess {
+struct AudioProcess: Identifiable, Hashable {
     let id: pid_t
     let objectID: AudioObjectID
     let bundleID: String?
     let name: String
+    let path: String?
+    let isApp: Bool
+    let audioActive: Bool
+    
+    init(objectID: AudioObjectID) throws {
+        self.objectID = objectID
+        
+        // 获取进程ID
+        guard let pid = objectID.readProcessPID() else {
+            throw "无法获取进程ID"
+        }
+        self.id = pid
+        
+        // 获取BundleID
+        self.bundleID = objectID.readProcessBundleID()
+        
+        // 获取进程音频活动状态
+        self.audioActive = objectID.readProcessIsRunning()
+        
+        // 获取进程信息
+        if let (procName, procPath) = processInfo(for: pid) {
+            self.name = procName
+            self.path = procPath
+            
+            // 检查是否为应用
+            let url = URL(fileURLWithPath: procPath)
+            self.isApp = url.pathExtension.lowercased() == "app"
+        } else if let bundleID = self.bundleID, let lastComponent = bundleID.components(separatedBy: ".").last {
+            self.name = lastComponent
+            self.path = nil
+            self.isApp = bundleID.contains(".app.")
+        } else {
+            self.name = "未知进程 (\(pid))"
+            self.path = nil
+            self.isApp = false
+        }
+    }
+    
+    init(app: NSRunningApplication, audioObjectID: AudioObjectID) {
+        self.id = app.processIdentifier
+        self.objectID = audioObjectID
+        self.bundleID = app.bundleIdentifier
+        self.name = app.localizedName ?? "未知应用"
+        self.path = app.bundleURL?.path
+        self.isApp = true
+        self.audioActive = audioObjectID.readProcessIsRunning()
+    }
+    
+    static func == (lhs: AudioProcess, rhs: AudioProcess) -> Bool {
+        lhs.id == rhs.id && lhs.objectID == rhs.objectID
+    }
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+        hasher.combine(objectID)
+    }
+}
+
+/// 获取进程的名称和路径
+private func processInfo(for pid: pid_t) -> (name: String, path: String)? {
+    let nameBuffer = UnsafeMutablePointer<UInt8>.allocate(capacity: Int(MAXPATHLEN))
+    let pathBuffer = UnsafeMutablePointer<UInt8>.allocate(capacity: Int(MAXPATHLEN))
+    
+    defer {
+        nameBuffer.deallocate()
+        pathBuffer.deallocate()
+    }
+    
+    let nameLength = proc_name(pid, nameBuffer, UInt32(MAXPATHLEN))
+    let pathLength = proc_pidpath(pid, pathBuffer, UInt32(MAXPATHLEN))
+    
+    guard nameLength > 0, pathLength > 0 else {
+        return nil
+    }
+    
+    let name = String(cString: nameBuffer)
+    let path = String(cString: pathBuffer)
+    
+    return (name, path)
 }
 
 /// 音频捕获控制器
@@ -248,7 +411,7 @@ class AudioCaptureController {
     func start(bufferHandler: @escaping (UnsafePointer<AudioBufferList>, AVAudioFormat) -> Void) throws {
         guard !isRunning else { return }
         
-        var format = AVAudioFormat(streamDescription: &tapStreamDescription)
+        let format = AVAudioFormat(streamDescription: &tapStreamDescription)
         guard let audioFormat = format else { throw "创建音频格式失败" }
         
         logger.info("使用音频格式: \(audioFormat.sampleRate)Hz, \(audioFormat.channelCount)通道")
@@ -291,8 +454,8 @@ class AudioCaptureController {
             AudioDeviceDestroyIOProcID(aggregateDeviceID, deviceProcID)
         }
         
-        AudioHardwareDestroyAggregateDevice(aggregateDeviceID)
-        AudioHardwareDestroyProcessTap(processTapID)
+        let _ = AudioHardwareDestroyAggregateDevice(aggregateDeviceID)
+        let _ = AudioHardwareDestroyProcessTap(processTapID)
     }
 }
 
@@ -309,6 +472,14 @@ class AudioService: AudioServiceProtocol {
     private var audioPlayer: AVAudioPlayer?
     private var playbackTimer: AnyCancellable?
     private var processingPlugins: [AudioProcessingPlugin] = []
+    
+    // 添加进程控制器
+    private let processController: AudioProcessController
+    
+    init() {
+        self.processController = AudioProcessController()
+        processController.startObserving()
+    }
     
     func addProcessingPlugin(_ plugin: AudioProcessingPlugin) {
         processingPlugins.append(plugin)
@@ -450,34 +621,35 @@ class AudioService: AudioServiceProtocol {
     // MARK: - 私有方法
     
     private func startSystemAudioRecording() throws {
-        // 创建 GUID 作为系统音频对象ID
-        let systemObjectIDs = try AudioObjectID.readProcessList()
-        var systemAudioObjectID: AudioObjectID?
+        logger.info("开始录制系统音频")
         
-        for objectID in systemObjectIDs {
-            if objectID.readProcessBundleID() == "com.apple.audio.coreaudio" {
-                systemAudioObjectID = objectID
-                break
+        // 尝试从进程控制器获取系统音频进程
+        guard let systemProcess = processController.systemAudioProcess else {
+            // 如果找不到，刷新一次再尝试
+            processController.refreshAudioProcesses()
+            
+            if let process = processController.systemAudioProcess {
+                try setupAudioCapture(audioObjectID: process.objectID, isSystem: true)
+            } else {
+                throw "无法找到系统音频对象，请检查系统音频是否正常"
             }
+            return
         }
         
-        guard let audioObjectID = systemAudioObjectID else {
-            throw "无法找到系统音频对象"
-        }
-        
-        try setupAudioCapture(audioObjectID: audioObjectID, isSystem: true)
+        try setupAudioCapture(audioObjectID: systemProcess.objectID, isSystem: true)
     }
     
     private func startAppAudioRecording(bundleId: String) throws {
-        let runningApps = NSWorkspace.shared.runningApplications
-        guard let app = runningApps.first(where: { $0.bundleIdentifier == bundleId }) else {
-            throw "无法找到运行中的应用: \(bundleId)"
+        logger.info("开始录制应用音频，bundleID: \(bundleId)")
+        
+        do {
+            // 使用进程控制器获取应用的音频对象ID
+            let audioObjectID = try processController.getAudioObjectIDForApp(bundleID: bundleId)
+            try setupAudioCapture(audioObjectID: audioObjectID, isSystem: false)
+        } catch {
+            logger.error("获取应用音频对象失败: \(error.localizedDescription)")
+            throw error
         }
-        
-        let pid = app.processIdentifier
-        let audioObjectID = try AudioObjectID.translatePIDToAudioObjectID(pid: pid)
-        
-        try setupAudioCapture(audioObjectID: audioObjectID, isSystem: false)
     }
     
     private func setupAudioCapture(audioObjectID: AudioObjectID, isSystem: Bool) throws {
@@ -540,6 +712,18 @@ class AudioService: AudioServiceProtocol {
                 self.recordingStatusSubject.send(.recording(duration: duration))
             }
     }
+    
+    func getRunningApps() -> [AppModels.RunningApp] {
+        processController.runningApps
+    }
+    
+    func refreshAudioProcesses() {
+        processController.refreshAudioProcesses()
+    }
+    
+    var audioProcesses: [AudioProcess] {
+        processController.processes
+    }
 }
 
 // MARK: - 辅助结构体
@@ -578,4 +762,175 @@ func AudioHardwareCreateProcessTap(_ description: CATapDescription, _ tapID: Uns
 func AudioHardwareCreateProcessTapImpl(_ description: CFDictionary, _ tapID: UnsafeMutablePointer<AudioObjectID>) -> OSStatus
 
 @_silgen_name("AudioHardwareDestroyProcessTap")
-func AudioHardwareDestroyProcessTap(_ tapID: AudioObjectID) -> OSStatus 
+func AudioHardwareDestroyProcessTap(_ tapID: AudioObjectID) -> OSStatus
+
+/// 应用音频进程控制器
+class AudioProcessController {
+    private let logger = Logger(subsystem: "com.lazyaudio", category: "AudioProcessController")
+    private var cancellables = Set<AnyCancellable>()
+    private var refreshTimer: Timer?
+    
+    private(set) var processes = [AudioProcess]()
+    private(set) var runningApps = [AppModels.RunningApp]()
+    private(set) var isObserving = false
+    
+    // 过滤后的进程
+    var appProcesses: [AudioProcess] {
+        processes.filter { $0.isApp }
+    }
+    
+    var systemAudioProcess: AudioProcess? {
+        processes.first { process in
+            process.bundleID == "com.apple.audio.coreaudio"
+        }
+    }
+    
+    func startObserving() {
+        guard !isObserving else { return }
+        isObserving = true
+        
+        // 设置进程刷新计时器，每3秒刷新一次
+        refreshTimer = Timer.scheduledTimer(withTimeInterval: 3.0, repeats: true) { [weak self] _ in
+            self?.refreshAudioProcesses()
+        }
+        
+        // 监听应用程序启动和退出
+        NSWorkspace.shared
+            .publisher(for: \.runningApplications, options: [.initial, .new])
+            .map { $0.filter { $0.processIdentifier != ProcessInfo.processInfo.processIdentifier } }
+            .sink { [weak self] apps in
+                self?.updateRunningApps(apps)
+            }
+            .store(in: &cancellables)
+        
+        // 立即刷新一次
+        refreshAudioProcesses()
+    }
+    
+    func stopObserving() {
+        isObserving = false
+        refreshTimer?.invalidate()
+        refreshTimer = nil
+        cancellables.removeAll()
+    }
+    
+    func refreshAudioProcesses() {
+        do {
+            // 尝试获取当前运行的有音频功能的进程
+            let audioObjectIDs = try AudioObjectID.readAudioProcessesFromCurrentlyRunningProcesses()
+            logger.debug("找到 \(audioObjectIDs.count) 个音频进程")
+            
+            let updatedProcesses = audioObjectIDs.compactMap { objectID -> AudioProcess? in
+                do {
+                    return try AudioProcess(objectID: objectID)
+                } catch {
+                    logger.warning("初始化音频进程失败: \(error.localizedDescription)")
+                    return nil
+                }
+            }
+            
+            // 按名称排序，并将有音频活动的进程排在前面
+            processes = updatedProcesses.sorted { p1, p2 in
+                if p1.audioActive && !p2.audioActive {
+                    return true
+                } else if !p1.audioActive && p2.audioActive {
+                    return false
+                }
+                return p1.name.localizedStandardCompare(p2.name) == .orderedAscending
+            }
+            
+            logger.debug("已更新音频进程列表，共 \(self.processes.count) 个进程")
+        } catch {
+            logger.error("刷新音频进程列表失败: \(error.localizedDescription)")
+        }
+    }
+    
+    private func updateRunningApps(_ apps: [NSRunningApplication]) {
+        let runningAppModels = apps.map { app in
+            AppModels.RunningApp(
+                processIdentifier: app.processIdentifier,
+                bundleIdentifier: app.bundleIdentifier ?? "unknown",
+                name: app.localizedName ?? app.bundleIdentifier?.components(separatedBy: ".").last ?? "未知应用",
+                icon: app.icon?.copy() as? NSImage ?? NSWorkspace.shared.icon(for: UTType.application)
+            )
+        }
+        
+        runningApps = runningAppModels.sorted { $0.name.localizedStandardCompare($1.name) == .orderedAscending }
+        logger.debug("已更新运行应用列表，共 \(self.runningApps.count) 个应用")
+    }
+    
+    func getAudioObjectIDForApp(bundleID: String) throws -> AudioObjectID {
+        // 首先检查已知的进程
+        if let process = processes.first(where: { $0.bundleID == bundleID }) {
+            logger.debug("从进程列表中找到应用的音频对象: \(process.name)")
+            return process.objectID
+        }
+        
+        // 如果找不到，尝试通过PID获取
+        if let app = runningApps.first(where: { $0.bundleIdentifier == bundleID }),
+           let nsApp = NSWorkspace.shared.runningApplications.first(where: { $0.processIdentifier == app.processIdentifier }) {
+            
+            let pid = nsApp.processIdentifier
+            
+            do {
+                let audioObjectID = try AudioObjectID.translatePIDToAudioObjectID(pid: pid)
+                logger.debug("通过PID获取应用的音频对象: \(nsApp.localizedName ?? bundleID)")
+                return audioObjectID
+            } catch {
+                logger.warning("通过PID获取音频对象失败: \(error.localizedDescription)")
+                throw error
+            }
+        }
+        
+        // 刷新一次再尝试
+        refreshAudioProcesses()
+        
+        if let process = processes.first(where: { $0.bundleID == bundleID }) {
+            logger.debug("刷新后从进程列表中找到应用的音频对象: \(process.name)")
+            return process.objectID
+        }
+        
+        throw "无法找到应用 \(bundleID) 的音频对象，该应用可能不产生音频或需要重启"
+    }
+    
+    deinit {
+        stopObserving()
+    }
+}
+enum AppModels {
+    /// 运行中的应用模型
+    struct RunningApp: Identifiable, Hashable {
+        let id = UUID()
+        let processIdentifier: pid_t
+        let bundleIdentifier: String
+        let name: String
+        let icon: NSImage?
+        
+        func hash(into hasher: inout Hasher) {
+            hasher.combine(processIdentifier)
+            hasher.combine(bundleIdentifier)
+        }
+        
+        static func == (lhs: RunningApp, rhs: RunningApp) -> Bool {
+            lhs.processIdentifier == rhs.processIdentifier && 
+            lhs.bundleIdentifier == rhs.bundleIdentifier
+        }
+    }
+    
+    /// 获取系统中运行的应用列表
+    static func getRunningApps() -> [RunningApp] {
+        let runningApps = NSWorkspace.shared.runningApplications
+            .filter { $0.activationPolicy == .regular } // 只保留常规应用程序
+            .map { app in
+                RunningApp(
+                    processIdentifier: app.processIdentifier,
+                    bundleIdentifier: app.bundleIdentifier ?? "unknown",
+                    name: app.localizedName ?? app.bundleIdentifier?.components(separatedBy: ".").last ?? "未知应用",
+                    icon: app.icon?.copy() as? NSImage ?? NSWorkspace.shared.icon(for: UTType.application)
+                )
+            }
+            .sorted { $0.name.localizedStandardCompare($1.name) == .orderedAscending }
+        
+        return runningApps
+    }
+} 

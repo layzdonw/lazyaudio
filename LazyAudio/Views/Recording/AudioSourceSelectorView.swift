@@ -9,6 +9,7 @@ struct AudioSourceSelectorView: View {
     @Binding var useMicrophone: Bool
     let isRecording: Bool
     let runningApps: [AppModels.RunningApp]
+    var onAppSourceSelected: (() -> Void)? // 添加一个回调函数，用于刷新应用列表
     
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -20,6 +21,12 @@ struct AudioSourceSelectorView: View {
             }
             .pickerStyle(.segmented)
             .disabled(isRecording)
+            .onChange(of: audioSourceType) { newValue in
+                // 当切换到应用音频时，调用回调函数刷新应用列表
+                if newValue == .appAudio {
+                    onAppSourceSelected?()
+                }
+            }
             
             // 应用选择器（仅在应用音频模式下显示）
             if audioSourceType == .appAudio {

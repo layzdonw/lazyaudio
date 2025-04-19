@@ -17,7 +17,10 @@ struct RecordingView: View {
                     selectedApp: $viewModel.selectedApp,
                     useMicrophone: $viewModel.useMicrophone,
                     isRecording: viewModel.isRecording,
-                    runningApps: viewModel.runningApps
+                    runningApps: viewModel.runningApps,
+                    onAppSourceSelected: {
+                        viewModel.loadRunningApps()
+                    }
                 )
                 
                 // 录制控制按钮
